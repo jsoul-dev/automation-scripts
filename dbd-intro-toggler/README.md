@@ -5,7 +5,7 @@ A fast batch script to easily disable or enable the intro video for Dead by Dayl
 ## Version
 Current Version: **1.0.0**
 
-[![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=download)](https://raw.githubusercontent.com/jsoul-dev/automation-scripts/main/dbd-intro-toggler/dbd-intro-toggler.bat)
+[![Download Script](https://img.shields.io/badge/Right--Click_%E2%86%92_Save_Link_As...-blue?style=for-the-badge&logo=download)](https://raw.githubusercontent.com/jsoul-dev/automation-scripts/main/dbd-intro-toggler/dbd-intro-toggler.bat)
 
 ## Overview
 Dead by Daylight forces an unskippable cinematic intro video every time you launch the game. This script automatically scans your PC for the game's installation directory across your Steam Libraries and Epic Games Library, and renames the `LoadingScreenPostLogin.bk2` video file to safely bypass it, getting you to the main menu faster. 
