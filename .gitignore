@@ -6,6 +6,6 @@
 session-*
 config.ini
 config.json
-Filtered/
 __pycache__/
+mkv-cleaner/Filtered
 hosts-blocker/hosts.txt
