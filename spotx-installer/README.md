@@ -1,6 +1,6 @@
 # SpotX Installer for Windows
 
-[![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=download)](https://raw.githack.com/jsoul-dev/automation-scripts/main/spotx-installer/spotx-installer.bat)
+[![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=download)](https://github.com/jsoul-dev/automation-scripts/releases/latest/download/spotx-installer.bat)
 
 An automated installer for [SpotX](https://github.com/SpotX-Official/SpotX), providing a customized, ad-free Spotify Desktop experience.
 

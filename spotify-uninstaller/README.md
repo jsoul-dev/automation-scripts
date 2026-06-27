@@ -1,6 +1,6 @@
 # Spotify Uninstaller for Windows
 
-[![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=download)](https://raw.githack.com/jsoul-dev/automation-scripts/main/spotify-uninstaller/spotify-uninstaller.bat)
+[![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=download)](https://github.com/jsoul-dev/automation-scripts/releases/latest/download/spotify-uninstaller.bat)
 
 Completely removes Spotify Desktop and Spotify Microsoft Store versions from your system.
 

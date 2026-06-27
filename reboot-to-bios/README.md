@@ -5,7 +5,7 @@ A simple Windows batch script that instantly restarts your PC and boots directly
 ## Version
 Current Version: **1.0.0**
 
-[![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=download)](https://raw.githack.com/jsoul-dev/automation-scripts/main/reboot-to-bios/reboot-to-bios.bat)
+[![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=download)](https://github.com/jsoul-dev/automation-scripts/releases/latest/download/reboot-to-bios.bat)
 
 ## Overview
 Booting into modern UEFI firmware settings can be frustrating because Fast Boot often bypasses the keyboard initialization phase too quickly. This script utilizes the native Windows `shutdown /r /fw` command to instruct the motherboard to load directly into the UEFI BIOS on the next restart.

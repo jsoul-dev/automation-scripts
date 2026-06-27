@@ -5,7 +5,7 @@ An AutoHotkey v2 script that monitors your Windows display projection mode and a
 ## Version
 Current Version: **1.0.0**
 
-[![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=download)](https://raw.githack.com/jsoul-dev/automation-scripts/main/display-mode-fixer/display-mode-fixer.ahk)
+[![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=download)](https://github.com/jsoul-dev/automation-scripts/releases/latest/download/display-mode-fixer.ahk)
 
 ## Overview
 When a TV or secondary display is plugged in but not actively being used, leaving the Windows projection mode in "Extend" or "Duplicate" can cause unexpected lagging or hanging while gaming on the primary monitor. This script runs silently in the system tray, monitors the display mode, and automatically forces it into single-display mode to ensure optimal gaming performance.
