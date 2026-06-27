@@ -1,0 +1,29 @@
+name: Auto Update Latest Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  update-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Upload scripts to latest release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Finding and uploading scripts to the 'latest' release..."
+          
+          # Find all script files in subdirectories and upload them, overwriting existing assets
+          find . -mindepth 2 -type f \( -name "*.bat" -o -name "*.py" -o -name "*.ps1" -o -name "*.ahk" \) -not -path "*/.git/*" | while read file; do
+            echo "Uploading $file..."
+            gh release upload latest "$file" --clobber
+          done
+          
+          echo "Upload complete!"
