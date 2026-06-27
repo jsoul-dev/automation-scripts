@@ -1,0 +1,14 @@
+@echo off
+
+:: Line for changing spotx parameters, each parameter should be separated by a space
+set param=-confirm_uninstall_ms_spoti -confirm_spoti_recomended_uninstall -new_theme -topsearchbar -newFullscreenMode -lyrics_stat spotify -podcasts_on -block_update_on -DisableStartup -cache_limit 500 -sendversion_off -start_spoti -no_pause
+
+set url='https://raw.githubusercontent.com/SpotX-Official/SpotX/refs/heads/main/run.ps1'
+set url2='https://spotx-official.github.io/SpotX/run.ps1'
+set tls=[Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12;
+
+%SYSTEMROOT%\System32\WindowsPowerShell\v1.0\powershell.exe ^
+-Command %tls% $p='%param%'; """ & { $(try { iwr -useb %url% } catch { $p+= ' -m'; iwr -useb %url2% })} $p """" | iex
+
+pause
+exit /b

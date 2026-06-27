@@ -1,0 +1,4 @@
+# Example
+127.0.0.1 test.example.com
+127.0.0.1 testexample1.com
+127.0.0.1 example12345.com
