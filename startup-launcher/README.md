@@ -5,6 +5,8 @@ A customizable Windows batch script designed to be placed in your Windows Startu
 ## Version
 Current Version: **1.0.0**
 
+[![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=download)](https://raw.githubusercontent.com/jsoul-dev/automation-scripts/main/startup-launcher/startup-launcher.bat)
+
 ## Setup & Usage
 
 1. Open `startup-launcher.bat` in a text editor (like Notepad).

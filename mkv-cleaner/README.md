@@ -5,6 +5,8 @@ An automated Python script designed to batch process MKV files and strip out unw
 ## Version
 Current Version: **1.0.0**
 
+[![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=download)](https://raw.githubusercontent.com/jsoul-dev/automation-scripts/main/mkv-cleaner/mkv-cleaner.py)
+
 > [!NOTE]
 > This script is currently pending an update/rewrite. It is a monolithic, single-file script (spaghetti code) that needs to be modularized and split into multiple files for better organization and maintainability.
 

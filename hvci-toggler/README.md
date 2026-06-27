@@ -5,6 +5,8 @@ A powerful batch script to easily toggle Windows Virtualization-Based Security (
 ## Version
 Current Version: **1.0.0**
 
+[![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=download)](https://raw.githubusercontent.com/jsoul-dev/automation-scripts/main/hvci-toggler/hvci-toggler.bat)
+
 ## Overview
 Windows 11 enables these security features by default, which can sometimes interfere with virtualization software, debugging tools, or older hardware drivers, and can cause a minor performance hit in some gaming scenarios. This script checks the status of these three features and allows you to toggle them all off or on simultaneously with a single key press.
 
