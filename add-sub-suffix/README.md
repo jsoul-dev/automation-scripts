@@ -5,6 +5,8 @@ A lightweight Python utility that scans directories for `.srt` subtitle files an
 ## Version
 Current Version: **1.0.0**
 
+[![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=download)](https://raw.githubusercontent.com/jsoul-dev/automation-scripts/main/add-sub-suffix/add-sub-suffix.py)
+
 ## Features
 - **Smart Detection**: Reads the filename to detect language keywords (e.g., "english", "spanish (latin american)") and maps them to the standard ISO 639-2 format.
 - **Idempotency**: Safely ignores files that already have a proper 3-letter suffix so it can be run multiple times safely.

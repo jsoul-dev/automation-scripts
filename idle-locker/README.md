@@ -5,6 +5,8 @@ A highly configurable AutoHotkey v2 script that monitors your system for inactiv
 ## Version
 Current Version: **1.0.0**
 
+[![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=download)](https://raw.githubusercontent.com/jsoul-dev/automation-scripts/main/idle-locker/idle-locker.ahk)
+
 ## Features
 - **Input Blocking**: Disables mouse movement and keyboard typing when the monitor is off to prevent accidental wake-ups.
 - **Auto-Mute**: Optionally mutes your system audio when the display turns off so you aren't startled by notifications.
