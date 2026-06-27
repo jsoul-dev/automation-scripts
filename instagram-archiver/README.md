@@ -5,7 +5,7 @@ An automated Python script that leverages `instaloader` to download and archive 
 ## Version
 Current Version: **1.0.0**
 
-[![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=download)](https://raw.githubusercontent.com/jsoul-dev/automation-scripts/main/instagram-archiver/instagram-archiver.py)
+[![Download Script](https://img.shields.io/badge/Right--Click_%E2%86%92_Save_Link_As...-blue?style=for-the-badge&logo=download)](https://raw.githubusercontent.com/jsoul-dev/automation-scripts/main/instagram-archiver/instagram-archiver.py)
 
 > [!NOTE]
 > This script is currently pending an update/rewrite. Some features or login mechanisms may be outdated or unoptimized. It is also currently a monolithic, single-file script (spaghetti code) that needs to be modularized and split into multiple files for better organization and maintainability.
