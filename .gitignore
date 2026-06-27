@@ -1,0 +1,10 @@
+# Ignore configuration files and session tokens
+
+.env
+*.bak
+*.pyc
+session-*
+config.ini
+config.json
+Filtered/
+__pycache__/
