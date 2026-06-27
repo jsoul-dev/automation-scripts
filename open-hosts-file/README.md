@@ -5,7 +5,7 @@ A simple utility script to quickly and securely edit the Windows `hosts` file.
 ## Version
 Current Version: **1.0.0**
 
-[![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=download)](https://raw.githack.com/jsoul-dev/automation-scripts/main/open-hosts-file/open-hosts-file.bat)
+[![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=download)](https://github.com/jsoul-dev/automation-scripts/releases/latest/download/open-hosts-file.bat)
 
 ## Overview
 Editing the Windows `hosts` file (`C:\Windows\System32\drivers\etc\hosts`) normally requires manually opening Notepad as an Administrator before navigating to the deeply buried file. 

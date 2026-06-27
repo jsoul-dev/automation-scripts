@@ -5,7 +5,7 @@ A robust PowerShell script that intelligently injects domain-blocking entries in
 ## Version
 Current Version: **1.0.0**
 
-[![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=download)](https://raw.githack.com/jsoul-dev/automation-scripts/main/hosts-blocker/hosts-blocker.ps1)
+[![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=download)](https://github.com/jsoul-dev/automation-scripts/releases/latest/download/hosts-blocker.ps1)
 
 ## Features
 - **Smart Grouping**: Instead of blindly appending entries to the end of your `hosts` file, it intelligently groups related entries together.

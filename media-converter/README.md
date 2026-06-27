@@ -5,7 +5,7 @@ A quick and easy batch script wrapped around FFmpeg to perform lossless remuxing
 ## Version
 Current Version: **1.0.0**
 
-[![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=download)](https://raw.githack.com/jsoul-dev/automation-scripts/main/media-converter/media-converter.bat)
+[![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=download)](https://github.com/jsoul-dev/automation-scripts/releases/latest/download/media-converter.bat)
 
 ## Dependencies
 You must have **FFmpeg** installed and added to your system's PATH. 

@@ -5,7 +5,7 @@ A lightweight Windows batch script to debloat the Brave Browser by applying ente
 ## Version
 Current Version: **1.0.0**
 
-[![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=download)](https://raw.githack.com/jsoul-dev/automation-scripts/main/brave-debloater/brave-debloater.bat)
+[![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=download)](https://github.com/jsoul-dev/automation-scripts/releases/latest/download/brave-debloater.bat)
 
 ## Features Disabled/Modified
 
