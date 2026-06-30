@@ -5,7 +5,7 @@ A collection of various automation scripts designed to streamline common tasks, 
 ## Available Scripts
 
 > [!TIP]
-> **Quick Download:** You can instantly download any script by clicking the ⬇️ icon next to its name. These direct downloads are hosted natively via GitHub Releases!
+> **Quick Download:** You can instantly download any script by clicking the ⬇️ icon next to its name. These direct downloads are hosted natively via GitHub Releases, powered by an automated CI/CD pipeline that ensures you are always downloading the absolute latest version!
 - [⬇️](https://github.com/jsoul-dev/automation-scripts/releases/latest/download/add-sub-suffix.py) **[Add Subtitle Suffix](./add-sub-suffix/)**: A lightweight Python script to automatically detect and append standard 3-letter language suffixes (e.g., `.eng.srt`) to subtitle files.
 - [⬇️](https://github.com/jsoul-dev/automation-scripts/releases/latest/download/brave-debloater.bat) **[Brave Debloater](./brave-debloater/)**: Debloats Brave Browser by applying enterprise policies to disable telemetry, bloatware, and built-in managers.
 - [⬇️](https://github.com/jsoul-dev/automation-scripts/releases/latest/download/dbd-intro-toggler.bat) **[DBD Intro Toggler](./dbd-intro-toggler/)**: A batch script that automatically detects Steam/Epic Games installations of Dead by Daylight and toggles the startup cinematic on or off.
