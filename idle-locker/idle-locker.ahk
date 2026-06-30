@@ -25,6 +25,8 @@ debugMode := false             ; logs events to file at %A_ScriptDir%\MonitorLoc
 idleTimeoutMinutes := 0        ; Will be auto-detected from Windows settings (0 = auto-detect)
 recheckTimeoutMinutes := 10    ; Re-check Windows timeout every X minutes
 idleDetectionEnabled := true   ; Master toggle for idle detection
+enableAutoRelock := true       ; true = automatically turn monitor back off if woken while locked
+autoRelockMinutes := 3         ; Minutes of idle time before turning monitor back off
 ; ==========================
 
 ; ===== GLOBALS =====
@@ -38,6 +40,7 @@ global autoDetectTimeout := (idleTimeoutMinutes = 0)  ; Remember if we're auto-d
 global customIdleMinutes := 10 ; For custom input fallback
 global mButtonHoldStart := 0  ; Track when middle button was pressed
 global mButtonHoldRequired := 2000  ; 2 seconds in milliseconds
+global monitorWokenTime := 0  ; Track when monitor was accidentally woken up
 
 global TimerMenu := Menu()
 global currentTimerMenuName := "Idle Timer: Auto"
@@ -59,6 +62,7 @@ A_TrayMenu.Add()
 
 A_TrayMenu.Add("Run at Startup", ToggleStartup)
 A_TrayMenu.Add("Idle Detection", ToggleIdleDetection)
+A_TrayMenu.Add("Auto Relock", ToggleAutoRelock)
 A_TrayMenu.Add("Notifications", ToggleNotifications)
 
 TimerMenu.Add("Auto (Windows Settings)", SetTimerPreset.Bind(0))
@@ -232,11 +236,25 @@ CheckIdleTime() {
     }
     ; If user became active again
     else if (idleTime < 1000 && monitorOff) {
-        DebugLog("User activity detected, idle time: " idleTime "ms")
+        if (monitorWokenTime == 0) {
+            DebugLog("User activity detected, idle time: " idleTime "ms")
+        }
         if (enableAutoOffMonitor) {
             TurnOnMonitor()
         }
         MonitorTurnedOn()
+    }
+    ; If monitor is locked, but was accidentally woken up, check if it's been idle again for autoRelockMinutes
+    else if (monitorOff && monitorWokenTime > 0 && enableAutoRelock && enableAutoOffMonitor) {
+        idleSinceWake := A_TickCount - monitorWokenTime
+        relockMs := autoRelockMinutes * 60 * 1000
+        
+        if (idleTime >= relockMs && idleSinceWake >= relockMs) {
+            DebugLog("Auto-relock timeout reached (" autoRelockMinutes " mins), turning monitor off again.")
+            TurnOffMonitor()
+            monitorWokenTime := 0 ; Reset so we don't spam the off command
+            try A_TrayMenu.Rename("Status: Monitor ON (Locked)", "Status: Monitor OFF - Locked")
+        }
     }
 }
 
@@ -255,11 +273,12 @@ TurnOnMonitor() {
 ; ===== HANDLERS =====
 MonitorTurnedOff() {
     global enableMouseBlock, enableKeyboardBlock, enableMute, monitorOff, mouseBlocked, keyboardBlocked,
-        enableAutoOffMonitor, enableAutoLockWindows
+        enableAutoOffMonitor, enableAutoLockWindows, monitorWokenTime
 
     if (monitorOff)
         return
     monitorOff := true
+    monitorWokenTime := 0
 
     DebugLog("Monitor turned OFF.")
 
@@ -539,6 +558,15 @@ ToggleIdleDetection(*) {
     DebugLog("Idle detection " (idleDetectionEnabled ? "enabled" : "disabled"))
 }
 
+ToggleAutoRelock(*) {
+    global enableAutoRelock
+    enableAutoRelock := !enableAutoRelock
+    UpdateTrayMenu()
+    ShowNotification("Auto Relock " (enableAutoRelock ? "Enabled" : "Disabled"),
+    enableAutoRelock ? "Will auto turn off monitor if woken while locked" : "Will not auto turn off monitor")
+    DebugLog("Auto Relock " (enableAutoRelock ? "enabled" : "disabled"))
+}
+
 ToggleMouseLock(*) {
     global enableMouseBlock
     enableMouseBlock := !enableMouseBlock
@@ -636,7 +664,7 @@ UpdateStatusText() {
 
 UpdateTrayMenu() {
     global enableMouseBlock, enableKeyboardBlock, enableMute, enableNotifications, idleDetectionEnabled
-    global enableAutoOffMonitor, enableAutoLockWindows, idleTimeoutMinutes, autoDetectTimeout
+    global enableAutoOffMonitor, enableAutoLockWindows, idleTimeoutMinutes, autoDetectTimeout, enableAutoRelock
     global TimerMenu, currentTimerMenuName
 
     if (enableAutoOffMonitor)
@@ -668,6 +696,11 @@ UpdateTrayMenu() {
         A_TrayMenu.Check("Idle Detection")
     else
         A_TrayMenu.Uncheck("Idle Detection")
+
+    if (enableAutoRelock)
+        A_TrayMenu.Check("Auto Relock")
+    else
+        A_TrayMenu.Uncheck("Auto Relock")
 
     if (enableNotifications)
         A_TrayMenu.Check("Notifications")

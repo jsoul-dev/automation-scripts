@@ -11,6 +11,7 @@ Current Version: **1.0.0**
 - **Input Blocking**: Disables mouse movement and keyboard typing when the monitor is off to prevent accidental wake-ups.
 - **Auto-Mute**: Optionally mutes your system audio when the display turns off so you aren't startled by notifications.
 - **Smart Detection**: Automatically syncs with your Windows Power Settings to detect your configured monitor timeout duration.
+- **Auto-Relock**: If your monitor is accidentally woken up while locked (e.g., bumping the mouse), the script will automatically turn the monitor back off after a configurable number of minutes.
 - **Configurable**: Contains a dedicated configuration block at the top of the file to easily toggle features on or off.
 - **Bonus Feature**: Press `Ctrl+Alt+T` on any active window to instantly toggle its "Always on Top" status!
 
