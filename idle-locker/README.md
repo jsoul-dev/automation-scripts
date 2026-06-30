@@ -22,7 +22,7 @@ Current Version: **1.0.0**
 5. **Configuration Options**:
    - **File Defaults**: You can permanently change the default startup settings by opening `idle-locker.ahk` in a text editor and modifying the variables inside the `===== CONFIGURATION =====` block.
    - **Tray Menu**: Right-click the script's icon in your system tray to access a convenient menu where you can instantly toggle features on the fly, such as Auto Mute, Mouse Lock, and Keyboard Lock.
-   - **Manual Lock**: Trigger a manual lock instantly by pressing `Ctrl+Alt+U`.
+   - **Manual Lock/Unlock**: You can instantly trigger a lock (or unlock your system) in two ways: by pressing `Ctrl+Alt+U`, or by clicking and holding the **Middle Mouse Button** for **2 seconds**.
 
 ## Screenshot
 ![Screenshot](../.github/assets/idle-locker.png)
