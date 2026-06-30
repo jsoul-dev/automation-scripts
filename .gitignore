@@ -9,3 +9,4 @@ config.json
 __pycache__/
 mkv-cleaner/Filtered
 hosts-blocker/hosts.txt
+tbh-decorator/taskbar_hero_save/
