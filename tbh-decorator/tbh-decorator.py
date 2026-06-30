@@ -17,6 +17,8 @@ import hmac
 import secrets
 from hashlib import pbkdf2_hmac
 
+__version__ = "1.0.0"
+
 # --- Stat Definitions from table.txt (Core stats only) ---
 STAT_OPTIONS = {
     1: "Attack Damage",
