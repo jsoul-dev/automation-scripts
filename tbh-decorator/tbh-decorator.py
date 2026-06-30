@@ -52,7 +52,7 @@ DEFAULT_SAVE_DIR  = (
     / "AppData" / "LocalLow" / "TesseractStudio" / "TaskBarHero"
 )
 DEFAULT_SAVE_FILE = DEFAULT_SAVE_DIR / "SaveFile_Live.es3"
-DEFAULT_JSON_DIR  = Path.cwd() / "taskbar_hero_save"
+DEFAULT_JSON_DIR  = Path.cwd() / "tbh-save-backups"
 PLAYER_JSON       = DEFAULT_JSON_DIR / "player.json"
 ACCOUNT_JSON      = DEFAULT_JSON_DIR / "account.json"
 

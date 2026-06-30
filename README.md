@@ -22,7 +22,7 @@ A collection of various automation scripts designed to streamline common tasks, 
 - [⬇️](https://github.com/jsoul-dev/automation-scripts/releases/latest/download/spotify-uninstaller.bat) **[Spotify Uninstaller](./spotify-uninstaller/)**: Completely removes Spotify Desktop, the Spotify Microsoft Store app, Spicetify, and all residual files/registry keys.
 - [⬇️](https://github.com/jsoul-dev/automation-scripts/releases/latest/download/spotx-installer.bat) **[SpotX Installer](./spotx-installer/)**: Installs SpotX to remove ads and add features to the Spotify desktop client.
 - [⬇️](https://github.com/jsoul-dev/automation-scripts/releases/latest/download/startup-launcher.bat) **[Startup Launcher](./startup-launcher/)**: A customizable batch script designed for `shell:startup` to seamlessly launch your background scripts on boot.
-- [⬇️](https://github.com/jsoul-dev/automation-scripts/releases/latest/download/tbh-decorator.py) **[TBH Decorator](./tbh-decorator/)**: A Python script to securely modify Taskbar Hero game saves with built-in backup support.
+- [⬇️](https://github.com/jsoul-dev/automation-scripts/releases/latest/download/tbh-decorator.py) **[TBH Decorator](./tbh-decorator/)**: A Python script to securely modify Task Bar Hero game saves with built-in backup support.
 - [⬇️](https://github.com/jsoul-dev/automation-scripts/releases/latest/download/turn-off-monitor.bat) **[Turn Off Monitor](./turn-off-monitor/)**: Instantly puts all connected monitors to sleep via a native Windows API call.
 - [⬇️](https://github.com/jsoul-dev/automation-scripts/releases/latest/download/twitch-recorder.py) **[Twitch Recorder](./twitch-recorder/)**: Automatically monitors and records Twitch streams using `streamlink` when a specified broadcaster goes live.
 

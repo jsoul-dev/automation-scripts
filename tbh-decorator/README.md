@@ -1,6 +1,6 @@
 # TBH Decorator
 
-A Python script that interacts with the Taskbar Hero game saves, allowing for stat modification and save file backups.
+A Python script that interacts with the Task Bar Hero game saves, allowing for stat modification and save file backups.
 
 ## Version
 Current Version: **1.0.0**
@@ -9,7 +9,7 @@ Current Version: **1.0.0**
 
 ## Features
 - **Stat Modification**: Interactively modifies core stats (Attack Damage, Attack Speed, Max HP, Armor) inside the save file.
-- **Automatic Backups**: Automatically generates backups of your save files in the `taskbar_hero_save/` directory before making any changes.
+- **Automatic Backups**: Automatically generates backups of your save files in the `tbh-save-backups/` directory before making any changes.
 - **Save File Integrity**: Handles encryption/decryption securely to ensure the game still recognizes the save file after modification.
 
 ## Setup & Usage
