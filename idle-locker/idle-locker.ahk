@@ -217,7 +217,7 @@ RunWaitOne(command) {
 }
 
 CheckIdleTime() {
-    global idleTimeoutMs, monitorOff, idleDetectionEnabled, enableAutoOffMonitor
+    global idleTimeoutMs, monitorOff, idleDetectionEnabled, enableAutoOffMonitor, monitorWokenTime, enableAutoRelock, autoRelockMinutes
 
     ; Skip if idle detection is disabled
     if (!idleDetectionEnabled)
@@ -317,7 +317,7 @@ MonitorTurnedOff() {
 }
 
 MonitorTurnedOn() {
-    global monitorOff
+    global monitorOff, monitorWokenTime
 
     if (!monitorOff)
         return
@@ -327,6 +327,11 @@ MonitorTurnedOn() {
 
     ; Don't change monitorOff state - keep it locked
     ; Don't unlock mouse/keyboard - wait for manual unlock
+    
+    if (monitorWokenTime == 0) {
+        monitorWokenTime := A_TickCount
+        DebugLog("Monitor wake tracked for auto-relock.")
+    }
 }
 
 ; ===== MIDDLE BUTTON HANDLERS =====
@@ -426,7 +431,7 @@ LockSystem() {
 }
 
 UnlockSystem() {
-    global mouseBlocked, keyboardBlocked, monitorOff, mButtonHoldStart
+    global mouseBlocked, keyboardBlocked, monitorOff, mButtonHoldStart, monitorWokenTime
 
     ; Reset middle button timer
     mButtonHoldStart := 0
@@ -444,6 +449,7 @@ UnlockSystem() {
     keyboardBlocked := false
     SoundSetMute(false)
     monitorOff := false
+    monitorWokenTime := 0
 
     ; Try to rename from all possible locked states
     try A_TrayMenu.Rename("Status: Manually Locked", "Status: Ready")
