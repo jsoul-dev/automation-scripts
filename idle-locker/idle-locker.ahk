@@ -25,7 +25,7 @@ debugMode := false             ; logs events to file at %A_ScriptDir%\MonitorLoc
 idleTimeoutMinutes := 0        ; Will be auto-detected from Windows settings (0 = auto-detect)
 recheckTimeoutMinutes := 10    ; Re-check Windows timeout every X minutes
 idleDetectionEnabled := true   ; Master toggle for idle detection
-enableAutoRelock := false      ; true = automatically turn monitor back off if woken while locked
+enableAutoRelock := true       ; true = automatically turn monitor back off if woken while locked
 autoRelockMinutes := 3         ; Minutes of idle time before turning monitor back off
 ; ==========================
 
