@@ -24,14 +24,19 @@ STAT_OPTIONS = {
     1: "Attack Damage",
     2: "Attack Speed",
     5: "Max HP",
-    6: "Armor"
+    6: "Armor",
+    10: "Cooldown Reduction",
+    48: "Additional XP"
 }
 
 # UI Mapping for cleaner menu
 MENU_OPTIONS = {
-    1: (1, "Attack Damage"),
+    1: (6, "Armor"),
     2: (5, "Max HP"),
-    3: (6, "Armor")
+    3: (2, "Attack Speed"),
+    4: (1, "Attack Damage"),
+    5: (48, "Additional XP"),
+    6: (10, "Cooldown Reduction")
 }
 
 # --- Keys / Constants (Taskbar Hero v1.00.21) ---
@@ -268,14 +273,28 @@ def inject_save():
     save.save(DEFAULT_SAVE_FILE, backup=True)
     print("[+] Injection complete! Original state backed up.")
 
-def get_decor_slots(rarity):
-    rarity = rarity.lower()
-    if rarity in ['legendary', 'relic']:
-        return 2
-    elif rarity in ['rare', 'epic']:
-        return 1
-    else:
-        return 0
+def get_decor_slots(rarity: str) -> int:
+    r = rarity.lower()
+    if 'cosmic' in r or 'divine' in r or 'celestial' in r: return 6
+    if 'beyond' in r: return 5
+    if 'arcana' in r: return 4
+    if 'immortal' in r: return 3
+    if 'legendary' in r: return 2
+    if 'rare' in r: return 1
+    return 0
+
+def get_rarity_color(rarity: str) -> str:
+    r = rarity.lower()
+    if 'cosmic' in r: return "\033[1;35m" # Bold Magenta / Deep Purple
+    if 'divine' in r: return "\033[1;97m" # Bold Bright White
+    if 'celestial' in r: return "\033[1;36m" # Bold Cyan
+    if 'beyond' in r: return "\033[96m"   # Light Blue / Cyan
+    if 'arcana' in r: return "\033[35m"   # Purple
+    if 'immortal' in r: return "\033[91m" # Pink / Red
+    if 'legendary' in r: return "\033[93m" # Gold / Yellow
+    if 'rare' in r: return "\033[94m"     # Blue
+    if 'uncommon' in r: return "\033[92m" # Green
+    return "\033[97m"                     # White (Common)
 
 def print_banner():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -361,11 +380,12 @@ def main():
                     val = enc.get("Value")
                     st_name = STAT_OPTIONS.get(st, f"Stat{st}")
                     
-                    # Special shorter names for cleaner UI
-                    if st == 1: st_name = "Atk Dmg"
-                    if st == 2: st_name = "Atk Spd"
-                    
-                    current_decors.append(f"{st_name} +{val}")
+                    if st == 2: # Attack Speed
+                        current_decors.append(f"{st_name} +{val / 100.0:.1f}")
+                    elif st == 10: # Cooldown Reduction
+                        current_decors.append(f"{st_name} +{val / 10.0:.1f}%")
+                    else:
+                        current_decors.append(f"{st_name} +{val}")
                     
             if max_decor > 0:
                 valid_items.append({
@@ -386,7 +406,10 @@ def main():
             else:
                 decor_str = " [\033[36mCurrent:\033[0m \033[90mEMPTY\033[0m]"
                 
-            print(f" [{idx+1}] {obj['hero']}'s {obj['slot']}: {obj['name']} ({obj['rarity']}) - {obj['max_decor']} slots{decor_str}")
+            rc = get_rarity_color(obj['rarity'])
+            colored_rarity = f"{rc}{obj['rarity']}\033[0m"
+            prefix = f"[{idx+1}]".rjust(4)
+            print(f" {prefix} {obj['hero']}'s {obj['slot']}: {obj['name']} ({colored_rarity}) - {obj['max_decor']} slots{decor_str}")
             
         choice = input("\n[>] Select target ID to manipulate (or 'q' to finish and inject): ")
         if choice.lower() == 'q':
@@ -408,7 +431,7 @@ def main():
         
         item = selected['item']
         enchants = item.get('EnchantData', [])
-        while len(enchants) < 6:
+        while len(enchants) < max(6, selected['max_decor']):
             enchants.append({"StatModKey": 0, "Tier": 0, "Value": 0, "RecipeType": 0, "ModType": 0, "MaterialKey": 0, "StatType": 0})
             
         for i in range(selected['max_decor']):
@@ -432,20 +455,32 @@ def main():
                 if menu_choice not in MENU_OPTIONS:
                     print("[-] Invalid parameter. Skipping slot.")
                     continue
-                stat_type, _ = MENU_OPTIONS[menu_choice]
+                stat_type, stat_name = MENU_OPTIONS[menu_choice]
                 stat_mod_key = int(f"100{stat_type}01")
             except ValueError:
                 print("[-] Invalid input.")
                 continue
                 
-            val_str = input("[>] Enter T10 stat value (e.g., 1000 up to 9184): ")
-            try:
-                val = int(val_str)
-                if val < 1000 or val > 9184:
-                    print("[-] \033[93mWARNING:\033[0m Value out of bounds (1000 - 9184). Forcing parameter anyway.")
-            except:
-                print("[-] Invalid syntax. Defaulting to 1000.")
-                val = 1000
+            if stat_type == 2: # Attack Speed
+                prompt_msg = f"[>] Enter {stat_name} value (e.g., 100 = +1.0) [1 to 1000]: "
+                min_val, max_val = 1, 1000
+            elif stat_type == 10: # Cooldown Reduction
+                prompt_msg = f"[>] Enter {stat_name} value (e.g., 100 = +10.0%) [1 to 1000]: "
+                min_val, max_val = 1, 1000
+            else:
+                prompt_msg = f"[>] Enter flat stat value for {stat_name} (1000 up to 9184): "
+                min_val, max_val = 1000, 9184
+                
+            while True:
+                val_str = input(prompt_msg)
+                try:
+                    val = int(val_str)
+                    if val < min_val or val > max_val:
+                        print(f"[-] \033[91mERROR:\033[0m Value out of bounds ({min_val} - {max_val}). Please enter a safe value.")
+                        continue
+                    break
+                except ValueError:
+                    print("[-] Invalid syntax. Please enter a number.")
                 
             enchants[i] = {
                 "RecipeType": 1,
