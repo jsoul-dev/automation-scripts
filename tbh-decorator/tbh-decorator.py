@@ -17,7 +17,7 @@ import hmac
 import secrets
 from hashlib import pbkdf2_hmac
 
-__version__ = "1.2.0"
+__version__ = "1.3.0"
 
 # --- Stat Definitions from table.txt (Core stats only) ---
 STAT_OPTIONS = {
@@ -482,20 +482,24 @@ def main():
                 continue
                 
             if stat_type == 2: # Attack Speed
-                prompt_msg = f"[>] Enter {stat_name} value (e.g., 100 = +1.0) [1 to 1000]: "
+                prompt_msg = f"[>] Enter {stat_name} value (e.g., 100 = +1.0) [1 to 1000] (Leave blank for Max): "
                 min_val, max_val = 1, 1000
             elif stat_type == 10: # Cooldown Reduction
-                prompt_msg = f"[>] Enter {stat_name} value (e.g., 100 = +10.0%) [1 to 1000]: "
+                prompt_msg = f"[>] Enter {stat_name} value (e.g., 100 = +10.0%) [1 to 1000] (Leave blank for Max): "
                 min_val, max_val = 1, 1000
             elif stat_type == 7: # Movement Speed
-                prompt_msg = f"[>] Enter flat stat value for {stat_name} (1000 up to 5000): "
-                min_val, max_val = 1000, 5000
+                prompt_msg = f"[>] Enter flat stat value for {stat_name} (1000 up to 3000) (Leave blank for Max): "
+                min_val, max_val = 1000, 3000
             else:
-                prompt_msg = f"[>] Enter flat stat value for {stat_name} (1000 up to 9184): "
+                prompt_msg = f"[>] Enter flat stat value for {stat_name} (1000 up to 9184) (Leave blank for Max): "
                 min_val, max_val = 1000, 9184
                 
             while True:
-                val_str = input(prompt_msg)
+                val_str = input(prompt_msg).strip()
+                if not val_str:
+                    val = max_val
+                    print(f"[*] Max value ({max_val}) automatically applied.")
+                    break
                 try:
                     val = int(val_str)
                     if val < min_val or val > max_val:
