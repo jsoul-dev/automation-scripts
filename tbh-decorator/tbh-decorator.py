@@ -17,7 +17,7 @@ import hmac
 import secrets
 from hashlib import pbkdf2_hmac
 
-__version__ = "1.3.2"
+__version__ = "1.3.3"
 
 # --- Stat Definitions from table.txt (Core stats only) ---
 STAT_OPTIONS = {
@@ -339,12 +339,12 @@ def main():
     
     procs = check_processes()
     if procs:
-        print(f"\n[-] ACCESS DENIED: Taskbar Hero is currently running!")
+        print(f"[-] ACCESS DENIED: Taskbar Hero is currently running!")
         print("[-] You must close the game completely before extracting or injecting data.")
         input("\nPress Enter to exit...")
         sys.exit(0)
     
-    print("\n[+] Process scan clear. Safe to proceed.")
+    print("[+] Process scan clear. Safe to proceed.")
     if not extract_save():
         sys.exit(1)
     
