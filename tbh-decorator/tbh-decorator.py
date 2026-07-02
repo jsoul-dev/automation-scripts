@@ -17,7 +17,7 @@ import hmac
 import secrets
 from hashlib import pbkdf2_hmac
 
-__version__ = "1.3.7"
+__version__ = "1.3.8"
 
 # --- Stat Definitions from table.txt (Core stats only) ---
 STAT_OPTIONS = {
@@ -498,8 +498,8 @@ def main():
                 prompt_msg = f"[>] Enter {stat_name} value (e.g., 100 = +10.0%) [1 to 1000] [Blank = Max]: "
                 min_val, max_val = 1, 1000
             elif stat_type == 7: # Movement Speed
-                prompt_msg = f"[>] Enter value for {stat_name} (1000 to 3000) [Blank = Max]: "
-                min_val, max_val = 1000, 3000
+                prompt_msg = f"[>] Enter value for {stat_name} (100 to 1000) [Blank = Max]: "
+                min_val, max_val = 100, 1000
             else:
                 prompt_msg = f"[>] Enter value for {stat_name} (1000 to 9184) [Blank = Max]: "
                 min_val, max_val = 1000, 9184
