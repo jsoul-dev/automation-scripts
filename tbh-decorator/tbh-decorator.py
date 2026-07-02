@@ -30,6 +30,15 @@ STAT_OPTIONS = {
     48: "Additional XP"
 }
 
+HERO_COLORS = {
+    "Knight": "\033[93m",     # Yellow
+    "Ranger": "\033[92m",     # Green
+    "Sorcerer": "\033[95m",   # Magenta
+    "Priest": "\033[96m",     # Cyan
+    "Hunter": "\033[33m",     # Dark Yellow/Orange
+    "Slayer": "\033[91m"      # Red
+}
+
 # UI Mapping for cleaner menu
 MENU_OPTIONS = {
     1: (6, "Armor"),
@@ -298,6 +307,12 @@ def get_rarity_color(rarity: str) -> str:
     if 'uncommon' in r: return "\033[92m" # Green
     return "\033[97m"                     # White (Common)
 
+def pad_line(text: str, width: int = 150) -> str:
+    ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+    visible_len = len(ansi_escape.sub('', text))
+    padding = " " * max(0, width - visible_len)
+    return text + padding
+
 def print_banner():
     os.system('cls' if os.name == 'nt' else 'clear')
     print(r"""
@@ -309,6 +324,8 @@ def print_banner():
 
 def main():
     os.system('') # Enable ANSI colors in Windows CMD
+    if os.name == 'nt':
+        os.system('mode con cols=150 lines=40')
     print_banner()
     
     procs = check_processes()
@@ -394,16 +411,25 @@ def main():
                 })
             
         for idx, obj in enumerate(valid_items):
+            # True background zebra striping using ANSI padding
+            bg = "\033[48;5;236m" if idx % 2 == 1 else ""
+            reset = f"\033[0m{bg}" if bg else "\033[0m"
+            
+            hc = HERO_COLORS.get(obj['hero'], "\033[97m")
+            colored_hero = f"{hc}{obj['hero']}{reset}"
+            
             if obj['current_decors']:
-                colored_decors = f"\033[92m{', '.join(obj['current_decors'])}\033[0m"
-                decor_str = f" [\033[36mCurrent:\033[0m {colored_decors}]"
+                colored_decors = f"\033[92m{', '.join(obj['current_decors'])}{reset}"
+                decor_str = f" [\033[36mCurrent:{reset} {colored_decors}]"
             else:
-                decor_str = " [\033[36mCurrent:\033[0m \033[90mEMPTY\033[0m]"
+                decor_str = f" [\033[36mCurrent:{reset} \033[90mEMPTY{reset}]"
                 
             rc = get_rarity_color(obj['rarity'])
-            colored_rarity = f"{rc}{obj['rarity']}\033[0m"
+            colored_rarity = f"{rc}{obj['rarity']}{reset}"
             prefix = f"[{idx+1}]".rjust(4)
-            print(f" {prefix} {obj['hero']}'s {obj['slot']}: {obj['name']} ({colored_rarity}) - {obj['max_decor']} slots{decor_str}")
+            
+            raw_line = f"{bg} {prefix} {colored_hero}'s {obj['slot']}: {obj['name']} ({colored_rarity}) - {obj['max_decor']} slots{decor_str}"
+            print(pad_line(raw_line) + "\033[0m")
             
         choice = input("\n[>] Select target ID to manipulate (or 'q' to finish and inject): ")
         if choice.lower() == 'q':
