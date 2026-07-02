@@ -17,7 +17,7 @@ import hmac
 import secrets
 from hashlib import pbkdf2_hmac
 
-__version__ = "1.3.4"
+__version__ = "1.3.5"
 
 # --- Stat Definitions from table.txt (Core stats only) ---
 STAT_OPTIONS = {
@@ -307,10 +307,13 @@ def get_rarity_color(rarity: str) -> str:
     if 'uncommon' in r: return "\033[92m" # Green
     return "\033[97m"                     # White (Common)
 
-def pad_line(text: str, width: int = 150) -> str:
+def pad_line(text: str, width: Optional[int] = None) -> str:
+    if width is None:
+        width = shutil.get_terminal_size().columns
     ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
     visible_len = len(ansi_escape.sub('', text))
-    padding = " " * max(0, width - visible_len)
+    # Avoid writing exactly at the edge to prevent implicit line wraps on some terminals
+    padding = " " * max(0, (width - 1) - visible_len)
     return text + padding
 
 def print_banner():
@@ -333,8 +336,6 @@ def print_banner():
 
 def main():
     os.system('') # Enable ANSI colors in Windows CMD
-    if os.name == 'nt':
-        os.system('mode con cols=150 lines=40')
     print_banner()
     
     procs = check_processes()
