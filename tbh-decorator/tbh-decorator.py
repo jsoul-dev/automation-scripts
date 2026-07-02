@@ -17,7 +17,7 @@ import hmac
 import secrets
 from hashlib import pbkdf2_hmac
 
-__version__ = "1.3.5"
+__version__ = "1.3.6"
 
 # --- Stat Definitions from table.txt (Core stats only) ---
 STAT_OPTIONS = {
@@ -377,7 +377,7 @@ def main():
             print_banner()
         first_loop = False
         
-        print("\n[!] \033[93mWARNING:\033[0m DO NOT put decors on tradable items or you risk getting banned/flagged.")
+        print("[!] \033[93mWARNING:\033[0m DO NOT put decors on tradable items or you risk getting banned/flagged.")
         print("    This script automatically filters out unequipped items to protect your account,")
         print("    because equipped items are inherently bound/untradable and much safer to edit.")
         print("\n[*] Discovering equipped targets...\n")
@@ -441,7 +441,7 @@ def main():
             raw_line = f"{bg} {prefix} {colored_hero}'s {obj['slot']}: {obj['name']} ({colored_rarity}) - {obj['max_decor']} slots{decor_str}"
             print(pad_line(raw_line) + "\033[0m")
             
-        choice = input("\n[>] Select target ID to manipulate (or 'q' to finish and inject): ")
+        choice = input("\n[>] Select target ID (or 'q'): ")
         if choice.lower() == 'q':
             break
             
@@ -466,16 +466,16 @@ def main():
             
         for i in range(selected['max_decor']):
             print(f"\n[*] Accessing Decor Slot {i+1}...")
-            ans = input(f"[?] Override slot {i+1}? (y/n) [y]: ")
+            ans = input(f"[?] Override? (y/n) [y]: ")
             if ans.lower() == 'n':
                 continue
                 
             print("\n[*] Available Stat Parameters:")
-            print("  0: Clear slot (Empty)")
+            print("  0: Clear slot")
             for menu_id, (st_key, st_name) in MENU_OPTIONS.items():
                 print(f"  {menu_id}: {st_name}")
             
-            stat_choice_str = input("\n[>] Enter parameter ID (0 to clear, or parameter ID): ")
+            stat_choice_str = input("\n[>] ID: ")
             if stat_choice_str == '0':
                 enchants[i] = {"StatModKey": 0, "Tier": 0, "Value": 0, "RecipeType": 0, "ModType": 0, "MaterialKey": 0, "StatType": 0}
                 continue
@@ -492,16 +492,16 @@ def main():
                 continue
                 
             if stat_type == 2: # Attack Speed
-                prompt_msg = f"[>] Enter {stat_name} value (e.g., 100 = +1.0) [1 to 1000] (Leave blank for Max): "
+                prompt_msg = f"[>] Enter {stat_name} value (e.g., 100 = +1.0) [1 to 1000] [Blank = Max]: "
                 min_val, max_val = 1, 1000
             elif stat_type == 10: # Cooldown Reduction
-                prompt_msg = f"[>] Enter {stat_name} value (e.g., 100 = +10.0%) [1 to 1000] (Leave blank for Max): "
+                prompt_msg = f"[>] Enter {stat_name} value (e.g., 100 = +10.0%) [1 to 1000] [Blank = Max]: "
                 min_val, max_val = 1, 1000
             elif stat_type == 7: # Movement Speed
-                prompt_msg = f"[>] Enter flat stat value for {stat_name} (1000 up to 3000) (Leave blank for Max): "
+                prompt_msg = f"[>] Enter value for {stat_name} (1000 to 3000) [Blank = Max]: "
                 min_val, max_val = 1000, 3000
             else:
-                prompt_msg = f"[>] Enter flat stat value for {stat_name} (1000 up to 9184) (Leave blank for Max): "
+                prompt_msg = f"[>] Enter value for {stat_name} (1000 to 9184) [Blank = Max]: "
                 min_val, max_val = 1000, 9184
                 
             while True:
