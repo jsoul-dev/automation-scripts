@@ -17,7 +17,7 @@ import hmac
 import secrets
 from hashlib import pbkdf2_hmac
 
-__version__ = "1.3.0"
+__version__ = "1.3.1"
 
 # --- Stat Definitions from table.txt (Core stats only) ---
 STAT_OPTIONS = {
@@ -315,12 +315,14 @@ def pad_line(text: str, width: int = 150) -> str:
 
 def print_banner():
     os.system('cls' if os.name == 'nt' else 'clear')
-    print(r"""
-  _______________________________________________________
- |                                                       |
- |            [ TBH: TASK BAR HERO DECORATOR ]           |
- |_______________________________________________________|
- """)
+    version_str = f"v{__version__}"
+    print(f"""
+    ========================================================
+    |                                                      |
+    |          [ TBH: TASK BAR HERO DECORATOR ]            |
+    |{version_str.center(54)}|
+    ========================================================
+    """)
 
 def main():
     os.system('') # Enable ANSI colors in Windows CMD
