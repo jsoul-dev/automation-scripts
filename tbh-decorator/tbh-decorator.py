@@ -17,7 +17,7 @@ import hmac
 import secrets
 from hashlib import pbkdf2_hmac
 
-__version__ = "1.3.6"
+__version__ = "1.3.7"
 
 # --- Stat Definitions from table.txt (Core stats only) ---
 STAT_OPTIONS = {
@@ -238,7 +238,7 @@ def check_processes():
     return running
 
 def fetch_item_db():
-    print("[*] Establishing uplink to tbh.city item database...")
+    print("[*] Establishing uplink to tbh.city item database...\n")
     try:
         req = urllib.request.Request("https://tbh.city/items", headers={"User-Agent": "TBH Save Editor/2.0"})
         with urllib.request.urlopen(req, timeout=10) as response:
@@ -441,7 +441,7 @@ def main():
             raw_line = f"{bg} {prefix} {colored_hero}'s {obj['slot']}: {obj['name']} ({colored_rarity}) - {obj['max_decor']} slots{decor_str}"
             print(pad_line(raw_line) + "\033[0m")
             
-        choice = input("\n[>] Select target ID (or 'q'): ")
+        choice = input("\n[>] Select target ID (or 'q' to finish and inject): ")
         if choice.lower() == 'q':
             break
             
@@ -456,7 +456,7 @@ def main():
             print("[-] Hardware limitation: Item rarity does not support decorations.")
             continue
             
-        print(f"\n[*] Target acquired: {selected['name']} ({selected['rarity']})")
+        print(f"\n[*] Target acquired: {selected['name']} ({get_rarity_color(selected['rarity'])}{selected['rarity']}\033[0m)")
         print("[!] \033[93mWARNING:\033[0m Assigning Attack Damage to defensive gear is highly suspicious.")
         
         item = selected['item']
@@ -465,17 +465,17 @@ def main():
             enchants.append({"StatModKey": 0, "Tier": 0, "Value": 0, "RecipeType": 0, "ModType": 0, "MaterialKey": 0, "StatType": 0})
             
         for i in range(selected['max_decor']):
-            print(f"\n[*] Accessing Decor Slot {i+1}...")
+            print(f"\n[*] Accessing Decor Slot {i+1}")
             ans = input(f"[?] Override? (y/n) [y]: ")
             if ans.lower() == 'n':
                 continue
                 
             print("\n[*] Available Stat Parameters:")
-            print("  0: Clear slot")
+            print("  0: Clear slot (Empty)")
             for menu_id, (st_key, st_name) in MENU_OPTIONS.items():
                 print(f"  {menu_id}: {st_name}")
             
-            stat_choice_str = input("\n[>] ID: ")
+            stat_choice_str = input("\n[>] Enter Parameter ID: ")
             if stat_choice_str == '0':
                 enchants[i] = {"StatModKey": 0, "Tier": 0, "Value": 0, "RecipeType": 0, "ModType": 0, "MaterialKey": 0, "StatType": 0}
                 continue
