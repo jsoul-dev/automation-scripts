@@ -17,7 +17,7 @@ import hmac
 import secrets
 from hashlib import pbkdf2_hmac
 
-__version__ = "1.3.1"
+__version__ = "1.3.2"
 
 # --- Stat Definitions from table.txt (Core stats only) ---
 STAT_OPTIONS = {
@@ -315,12 +315,19 @@ def pad_line(text: str, width: int = 150) -> str:
 
 def print_banner():
     os.system('cls' if os.name == 'nt' else 'clear')
-    version_str = f"v{__version__}"
+    
+    title = f"[ TBH: TASK BAR HERO DECORATOR \033[96mv{__version__}\033[0m ]"
+    visible_title = f"[ TBH: TASK BAR HERO DECORATOR v{__version__} ]"
+    
+    padding = 54 - len(visible_title)
+    left_pad = " " * (padding // 2)
+    right_pad = " " * (padding - len(left_pad))
+    
     print(f"""
     ========================================================
     |                                                      |
-    |          [ TBH: TASK BAR HERO DECORATOR ]            |
-    |{version_str.center(54)}|
+    |{left_pad}{title}{right_pad}|
+    |                                                      |
     ========================================================
     """)
 

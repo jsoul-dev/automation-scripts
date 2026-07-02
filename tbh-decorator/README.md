@@ -3,7 +3,7 @@
 A Python script that interacts with the Task Bar Hero game saves, allowing for stat modification and save file backups.
 
 ## Version
-Current Version: **1.3.1**
+Current Version: **1.3.2**
 
 [![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=download)](https://github.com/jsoul-dev/automation-scripts/releases/latest/download/tbh-decorator.py)
 
