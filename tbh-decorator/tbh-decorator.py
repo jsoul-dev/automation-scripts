@@ -25,6 +25,7 @@ STAT_OPTIONS = {
     2: "Attack Speed",
     5: "Max HP",
     6: "Armor",
+    7: "Movement Speed",
     10: "Cooldown Reduction",
     48: "Additional XP"
 }
@@ -36,7 +37,8 @@ MENU_OPTIONS = {
     3: (2, "Attack Speed"),
     4: (1, "Attack Damage"),
     5: (48, "Additional XP"),
-    6: (10, "Cooldown Reduction")
+    6: (7, "Movement Speed"),
+    7: (10, "Cooldown Reduction")
 }
 
 # --- Keys / Constants (Taskbar Hero v1.00.21) ---
@@ -220,7 +222,7 @@ def check_processes():
     for proc in psutil.process_iter(['name']):
         try:
             name = proc.info['name']
-            if name and name.lower() in ['taskbarhero.exe', 'steam.exe']:
+            if name and name.lower() in ['taskbarhero.exe']:
                 running.append(name.lower())
         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
             pass
@@ -311,17 +313,9 @@ def main():
     
     procs = check_processes()
     if procs:
-        print(f"\n[-] ACCESS DENIED: Active processes detected! ({', '.join(procs)})")
-        print("[-] Manual override required: Close TaskbarHero and Steam before proceeding.")
-        
-        if PLAYER_JSON.exists():
-            ans = input("\n[?] Do you want to INJECT an existing payload? (y/n) [n]: ")
-            if ans.lower().startswith('y'):
-                print("[!] \033[93mWARNING:\033[0m Hot-injecting while game is active risks database corruption.")
-                ans2 = input("[?] Confirm force injection? (y/n) [n]: ")
-                if ans2.lower().startswith('y'):
-                    inject_save()
-                    input("\nPress Enter to exit...")
+        print(f"\n[-] ACCESS DENIED: Taskbar Hero is currently running!")
+        print("[-] You must close the game completely before extracting or injecting data.")
+        input("\nPress Enter to exit...")
         sys.exit(0)
     
     print("\n[+] Process scan clear. Safe to proceed.")
@@ -467,6 +461,9 @@ def main():
             elif stat_type == 10: # Cooldown Reduction
                 prompt_msg = f"[>] Enter {stat_name} value (e.g., 100 = +10.0%) [1 to 1000]: "
                 min_val, max_val = 1, 1000
+            elif stat_type == 7: # Movement Speed
+                prompt_msg = f"[>] Enter flat stat value for {stat_name} (1000 up to 5000): "
+                min_val, max_val = 1000, 5000
             else:
                 prompt_msg = f"[>] Enter flat stat value for {stat_name} (1000 up to 9184): "
                 min_val, max_val = 1000, 9184
@@ -512,8 +509,8 @@ def main():
     
     procs = check_processes()
     if procs:
-        print(f"\n[!] ALERT: Game or Steam launched during edit! ({', '.join(procs)})")
-        print("[-] Aborting auto-inject. Close them and run script again to INJECT.")
+        print(f"\n[!] ALERT: Taskbar Hero was launched during edit!")
+        print("[-] Aborting auto-inject to prevent corruption. Close the game and run script again to INJECT.")
     else:
         ans = input("\n[?] Ready to inject payload into game memory? (y/n) [y]: ")
         if ans.lower() != 'n':
