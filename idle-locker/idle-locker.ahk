@@ -12,7 +12,7 @@ if (!A_IsAdmin) {
     }
     ExitApp()
 }
-global Version := "1.0.0"
+global Version := "1.1.0"
 
 ; ===== CONFIGURATION =====
 enableMouseBlock := true       ; true = disable mouse when monitor turns off
