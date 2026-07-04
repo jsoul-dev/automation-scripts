@@ -292,14 +292,14 @@ set "state=%~3"
 :: Pad number for alignment
 if %num% LSS 10 (set "numpad= [%num%]") else (set "numpad=[%num%]")
 
-:: Pad name to 16 chars
-set "name=%name%                "
-set "name=!name:~0,16!"
+:: Pad name to 18 chars
+set "name=%name%                  "
+set "name=!name:~0,18!"
 
 if "%state%"=="0" (
-    powershell -Command "Write-Host '  %numpad% !name![INCLUDE]' -ForegroundColor Green"
+    powershell -Command "Write-Host '  %numpad% !name! [INCLUDE]' -ForegroundColor Green"
 ) else (
-    echo   %numpad% !name![EXCLUDE]
+    echo   %numpad% !name! [EXCLUDE]
 )
 endlocal
 goto :eof
