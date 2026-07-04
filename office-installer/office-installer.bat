@@ -19,7 +19,7 @@ set "VERSION=1.2.0"
 
 :: Console dimensions
 title Office 365 ProPlus Installer
-mode con: cols=55 lines=40
+mode con: cols=53 lines=38
 color 07
 
 :: ---- Default App States (1=EXCLUDE, 0=INCLUDE) ----
