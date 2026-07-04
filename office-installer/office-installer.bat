@@ -2,7 +2,7 @@
 
 :: =====================================================
 ::  Office 365 ProPlus Installer
-::  Version 1.1.0
+::  Version 1.2.0
 :: =====================================================
 
 :: Self-elevate to administrator
@@ -15,11 +15,11 @@ if %errorlevel% neq 0 (
 
 :: ---- Configuration ----
 
-set "VERSION=1.1.0"
+set "VERSION=1.2.0"
 
 :: Console dimensions
 title Office 365 ProPlus Installer
-mode con: cols=53 lines=35
+mode con: cols=55 lines=40
 color 07
 
 :: ---- Default App States (1=EXCLUDE, 0=INCLUDE) ----
@@ -38,6 +38,7 @@ set "app_Publisher=1"
 set "app_Teams=1"
 set "app_Bing=1"
 set "app_Word=0"
+set "opt_Shortcuts=0"
 
 :: =====================================================
 ::  Main Menu
@@ -72,6 +73,9 @@ call :ShowOption 12 Groove         %app_Groove%
 call :ShowOption 13 "M365 Companion" %app_M365Companion%
 call :ShowOption 14 "Bing Search"  %app_Bing%
 echo.
+echo  --- OPTIONS ---
+call :ShowOption 15 "Desktop Shortcuts" %opt_Shortcuts%
+echo.
 echo =====================================================
 echo   [A] Include ALL Apps     [D] Default Selection
 powershell -Command "Write-Host '  [I] Start Installation' -ForegroundColor Cyan -NoNewline; Write-Host '   [E] Export Config'"
@@ -94,6 +98,7 @@ if /i "%choice%"=="11" if "%app_OneDrive%"=="0" (set "app_OneDrive=1") else (set
 if /i "%choice%"=="12" if "%app_Groove%"=="0" (set "app_Groove=1") else (set "app_Groove=0")
 if /i "%choice%"=="13" if "%app_M365Companion%"=="0" (set "app_M365Companion=1") else (set "app_M365Companion=0")
 if /i "%choice%"=="14" if "%app_Bing%"=="0" (set "app_Bing=1") else (set "app_Bing=0")
+if /i "%choice%"=="15" if "%opt_Shortcuts%"=="0" (set "opt_Shortcuts=1") else (set "opt_Shortcuts=0")
 
 if /i "%choice%"=="A" (
     set "app_Access=0"
@@ -110,6 +115,7 @@ if /i "%choice%"=="A" (
     set "app_Teams=0"
     set "app_Bing=0"
     set "app_Word=0"
+    set "opt_Shortcuts=0"
 )
 
 if /i "%choice%"=="D" (
@@ -127,6 +133,7 @@ if /i "%choice%"=="D" (
     set "app_Teams=1"
     set "app_Bing=1"
     set "app_Word=0"
+    set "opt_Shortcuts=0"
 )
 
 if /i "%choice%"=="Q" exit /b
@@ -209,6 +216,8 @@ echo =====================================================
 echo          Installation Complete!
 echo =====================================================
 echo.
+
+if "%opt_Shortcuts%"=="0" call :CreateShortcuts
 
 set /p "activate=Do you want to activate Office? (Y/N): "
 if /i "%activate%"=="Y" call :Activate
@@ -344,3 +353,32 @@ echo Launching Microsoft Activation Scripts...
 echo.
 powershell -Command "try { irm https://get.activated.win | iex } catch { Write-Host 'Primary method blocked, using DNS-over-HTTPS fallback...' -ForegroundColor Yellow; iex (curl.exe -s --doh-url https://1.1.1.1/dns-query https://get.activated.win ^| Out-String) }"
 goto :eof
+
+:: ---- :CreateShortcuts ----
+:: Copies Start Menu shortcuts for included apps to the Desktop.
+
+:CreateShortcuts
+echo =====================================================
+echo         Creating Desktop Shortcuts...
+echo =====================================================
+echo.
+set "startmenu=C:\ProgramData\Microsoft\Windows\Start Menu\Programs"
+set "desktop=%USERPROFILE%\Desktop"
+
+if "%app_Word%"=="0" copy /y "%startmenu%\Word.lnk" "%desktop%\" >nul 2>&1
+if "%app_Excel%"=="0" copy /y "%startmenu%\Excel.lnk" "%desktop%\" >nul 2>&1
+if "%app_PowerPoint%"=="0" copy /y "%startmenu%\PowerPoint.lnk" "%desktop%\" >nul 2>&1
+if "%app_Outlook%"=="0" copy /y "%startmenu%\Outlook.lnk" "%desktop%\" >nul 2>&1
+if "%app_OneNote%"=="0" copy /y "%startmenu%\OneNote.lnk" "%desktop%\" >nul 2>&1
+if "%app_Access%"=="0" copy /y "%startmenu%\Access.lnk" "%desktop%\" >nul 2>&1
+if "%app_Publisher%"=="0" copy /y "%startmenu%\Publisher.lnk" "%desktop%\" >nul 2>&1
+if "%app_Teams%"=="0" copy /y "%startmenu%\Microsoft Teams.lnk" "%desktop%\" >nul 2>&1
+if "%app_Lync%"=="0" copy /y "%startmenu%\Skype for Business.lnk" "%desktop%\" >nul 2>&1
+if "%app_OutlookForWindows%"=="0" copy /y "%startmenu%\Outlook (new).lnk" "%desktop%\" >nul 2>&1
+if "%app_OneDrive%"=="0" copy /y "%startmenu%\OneDrive.lnk" "%desktop%\" >nul 2>&1
+if "%app_Groove%"=="0" copy /y "%startmenu%\OneDrive for Business.lnk" "%desktop%\" >nul 2>&1
+
+powershell -Command "Write-Host 'Desktop shortcuts created.' -ForegroundColor Green"
+echo.
+goto :eof
+
