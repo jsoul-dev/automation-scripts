@@ -197,7 +197,7 @@ powershell -Command "Invoke-WebRequest -Uri 'https://officecdn.microsoft.com/pr/
 
 if not exist "C:\Office\setup.exe" (
     echo.
-    echo ERROR: Failed to download setup.exe
+    echo %ESC%[31mERROR: Failed to download setup.exe%ESC%[0m
     echo Please check your internet connection and try again.
     pause
     exit /b 1
@@ -209,7 +209,7 @@ echo.
 
 if %errorlevel% neq 0 (
     echo.
-    echo ERROR: Office installation exited with code %errorlevel%
+    echo %ESC%[31mERROR: Office installation exited with code %errorlevel%%ESC%[0m
     echo Check the logs above for details.
     echo.
     pause
