@@ -15,7 +15,10 @@ if %errorlevel% neq 0 (
 
 :: ---- Configuration ----
 
-set "VERSION=1.2.0"
+set "VERSION=1.3.0"
+
+:: Set ANSI escape character
+for /f %%a in ('echo prompt $E ^| cmd') do set "ESC=%%a"
 
 :: Console dimensions
 title Office 365 ProPlus Installer
@@ -78,7 +81,7 @@ call :ShowOption 15 "Desktop Shortcuts" %opt_Shortcuts%
 echo.
 echo =====================================================
 echo   [A] Include ALL Apps     [D] Default Selection
-powershell -Command "Write-Host '  [I] Start Installation' -ForegroundColor Cyan -NoNewline; Write-Host '   [E] Export Config'"
+echo %ESC%[36m  [I] Start Installation   [E] Export Config%ESC%[0m
 echo   [K] Skip to Activation   [Q] Quit
 echo =====================================================
 echo.
@@ -152,9 +155,14 @@ echo =====================================================
 echo              Confirm Installation
 echo =====================================================
 echo.
-powershell -Command "Write-Host ' WARNING: If you have any existing Office' -ForegroundColor Yellow; Write-Host ' installation, it will be AUTOMATICALLY' -ForegroundColor Yellow; Write-Host ' UNINSTALLED and replaced with this one.' -ForegroundColor Yellow"
+echo %ESC%[33m WARNING: If you have any existing Office
+echo  installation, it will be AUTOMATICALLY
+echo  UNINSTALLED and replaced with this one.%ESC%[0m
 echo.
-powershell -Command "Write-Host ' NOTE: To ADD apps (e.g. Teams) to an existing' -ForegroundColor Cyan; Write-Host ' Office installation (e.g. Word, Excel, PPT),' -ForegroundColor Cyan; Write-Host ' you MUST include ALL apps you want to keep.' -ForegroundColor Cyan; Write-Host ' Apps not selected will be UNINSTALLED by ODT.' -ForegroundColor Cyan"
+echo %ESC%[36m NOTE: To ADD apps (e.g. Teams) to an existing
+echo  Office installation (e.g. Word, Excel, PPT),
+echo  you MUST include ALL apps you want to keep.
+echo  Apps not selected will be UNINSTALLED by ODT.%ESC%[0m
 echo.
 echo  Apps to be INSTALLED:
 if "%app_Word%"=="0" echo    - Word
@@ -267,7 +275,7 @@ if not defined downloads set "downloads=%USERPROFILE%\Downloads"
 
 call :WriteXml "%downloads%\Configuration.xml"
 
-powershell -Command "Write-Host 'Configuration.xml saved to:' -ForegroundColor Green"
+echo %ESC%[32mConfiguration.xml saved to:%ESC%[0m
 echo   %downloads%\Configuration.xml
 echo.
 echo =====================================================
@@ -297,7 +305,7 @@ set "name=%name%                  "
 set "name=!name:~0,18!"
 
 if "%state%"=="0" (
-    powershell -Command "Write-Host '  %numpad% !name! [INCLUDE]' -ForegroundColor Green"
+    echo %ESC%[32m  %numpad% !name! [INCLUDE]%ESC%[0m
 ) else (
     echo   %numpad% !name! [EXCLUDE]
 )
@@ -378,7 +386,7 @@ if "%app_OutlookForWindows%"=="0" copy /y "%startmenu%\Outlook (new).lnk" "%desk
 if "%app_OneDrive%"=="0" copy /y "%startmenu%\OneDrive.lnk" "%desktop%\" >nul 2>&1
 if "%app_Groove%"=="0" copy /y "%startmenu%\OneDrive for Business.lnk" "%desktop%\" >nul 2>&1
 
-powershell -Command "Write-Host 'Desktop shortcuts created.' -ForegroundColor Green"
+echo %ESC%[32mDesktop shortcuts created.%ESC%[0m
 echo.
 goto :eof
 
