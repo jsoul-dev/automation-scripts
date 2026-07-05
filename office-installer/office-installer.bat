@@ -81,7 +81,7 @@ call :ShowOption 15 "Desktop Shortcuts" %opt_Shortcuts%
 echo.
 echo =====================================================
 echo   [A] Include ALL Apps     [D] Default Selection
-echo %ESC%[36m  [I] Start Installation   [E] Export Config%ESC%[0m
+echo %ESC%[36m  [I] Start Installation%ESC%[0m   [E] Export Config
 echo   [K] Skip to Activation   [Q] Quit
 echo =====================================================
 echo.
