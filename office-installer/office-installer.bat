@@ -258,7 +258,7 @@ echo =====================================================
 echo           Export Configuration File
 echo =====================================================
 echo.
-echo Generating Configuration.xml based on your selection...
+echo Generating Configuration.xml based on your selection
 echo.
 
 :: Get Downloads folder path
@@ -345,7 +345,7 @@ echo        Office Activation Instructions
 echo =====================================================
 echo.
 echo When the activation menu appears:
-echo   Select Option [2] Ohook - for permanent Office activation
+echo   Select Option [2] Ohook - for Office activation
 echo.
 echo =====================================================
 echo.
