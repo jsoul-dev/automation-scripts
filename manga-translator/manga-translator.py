@@ -215,7 +215,10 @@ if __name__ == "__main__":
                 print(Fore.RED + f"  Failed: {stats['failed']}")
             else:
                 print(Fore.CYAN + f"  Failed: {stats['failed']}")
-            print(Fore.CYAN + "="*30 + "\n")
+            print(Fore.CYAN + "="*30)
                 
     except KeyboardInterrupt:
         print(Fore.YELLOW + "\n\nScript interrupted by user. Exiting gracefully...")
+        
+    print()
+    input("Press Enter to exit...")
