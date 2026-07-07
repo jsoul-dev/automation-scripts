@@ -4,8 +4,9 @@
 *.bak
 *.pyc
 session-*
-config.ini
-config.json
+*.ini
+*.json
+*.exe
 __pycache__/
 mkv-cleaner/Filtered
 hosts-blocker/hosts.txt
