@@ -3,10 +3,10 @@
 .env
 *.bak
 *.pyc
-session-*
 *.ini
 *.json
 *.exe
+session-*
 __pycache__/
 mkv-cleaner/Filtered
 hosts-blocker/hosts.txt
