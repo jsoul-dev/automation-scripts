@@ -99,7 +99,7 @@ def translate(imagePath, outFolder, prefix="", slang='ja', tlang='en'):
         fh.seek(0)
 
         # Upload
-        print(Fore.CYAN + f"  Credits ({uid['cr']}/3)")
+        print(Fore.CYAN + f"  Credits ({4 - uid['cr']}/3)")
         uid['cr'] -= 1
         print(Fore.CYAN + '  Uploading... ', end='', flush=True)
         ses.post(uurl, data=udat, files={'file': fh}, headers=headers, cookies={'csrftoken': csrf})
