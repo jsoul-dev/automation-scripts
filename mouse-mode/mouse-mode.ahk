@@ -2,7 +2,7 @@
 #SingleInstance Force
 
 ; ============================================================================
-; Mouse Mode Switcher
+; Mouse Mode
 ; ----------------------------------------------------------------------------
 ; A lightweight tray utility that switches the mouse's side buttons
 ; (XButton1 / XButton2) between three behaviors:
@@ -24,7 +24,7 @@
 ; CONSTANTS - every configurable value lives here.
 ; ============================================================================
 
-APP_NAME    := "Mouse Mode Switcher"
+APP_NAME    := "Mouse Mode"
 APP_VERSION := "1.1.0"
 
 ; --- Modes ---------------------------------------------------------------
