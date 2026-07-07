@@ -39,7 +39,7 @@ def natural_sort_key(s):
     import re
     return [int(text) if text.isdigit() else text.lower() for text in re.split('([0-9]+)', s)]
 
-def translate(imagePath, outFolder, ses, slang='ja', tlang='en'):
+def translate(imagePath, outFolder, slang='ja', tlang='en'):
     fn = basename(imagePath)
     mime = mimetypes.guess_type(imagePath)[0]
     
@@ -51,7 +51,10 @@ def translate(imagePath, outFolder, ses, slang='ja', tlang='en'):
         print(Fore.YELLOW + '  Done (Skipped - already exists)')
         return True
 
+    ses = requests.Session()
     headers = ua.copy()
+    ses.get('https://www.mangatranslate.com', headers=headers)
+
     user_id = getUserId()
     csrf = f"{int(user_id[-24:], 16)}"
 
@@ -184,14 +187,11 @@ if __name__ == "__main__":
                     print(Fore.YELLOW + "  No files found in folder.")
                     continue
                     
-                ses = requests.Session()
-                ses.get('https://www.mangatranslate.com', headers=ua)
-                
                 folder_success = True
                 for i, f in enumerate(files, 1):
                     print(Fore.CYAN + f"\n[{i}/{total_files}] ", end='')
                     try:
-                        translate(join(folder_path, f), tmp_folder_path, ses, src_lang, out_lang)
+                        translate(join(folder_path, f), tmp_folder_path, src_lang, out_lang)
                     except KeyboardInterrupt:
                         raise
                     except Exception as e:
