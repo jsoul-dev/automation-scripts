@@ -9,7 +9,7 @@ cls
 
 echo.
 echo  WIFI CREDENTIAL EXTRACTOR v%VERSION%
-echo  ------------------------------
+echo  --------------------------------
 echo.
 echo [*] Querying Windows WLAN API for cached profiles...
 ping 127.0.0.1 -n 2 >nul
