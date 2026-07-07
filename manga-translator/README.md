@@ -25,3 +25,6 @@ pip install requests colorama
 - **Batch Processing**: Automatically loops through all images in a specified folder.
 - **Session Management**: Automatically rotates temporary user sessions to bypass API credit limits.
 - **Resumption**: Skips over folders that have already been translated and saved in the output directory.
+
+> [!WARNING]
+> **v2.0.0 Notice**: The latest version introduced an optimization that reuses a single HTTP session per folder to massively increase upload speeds. This change is currently **untested** in production and may potentially interfere with the API credit limit bypass (as the server might track persistent cookies across images). If you experience rate-limit errors, you may need to revert to a fresh session per image.
