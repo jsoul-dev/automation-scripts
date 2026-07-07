@@ -224,6 +224,7 @@ if __name__ == "__main__":
                     
                 folder_success = True
                 already_done_count = 0
+                abort_all = False
                 for i, f in enumerate(files, 1):
                     # Quick check before printing to avoid spamming the console for fully completed folders
                     outPath = join(output_folder_path, basename(f))
@@ -251,6 +252,11 @@ if __name__ == "__main__":
                             else:
                                 if "Too many requests" in error_msg or "rate limit" in error_msg.lower():
                                     print(Fore.RED + f"\n  [!] Rate limit hit: {error_msg}")
+                                    ans = input(Fore.YELLOW + "  Wait 60s to retry, or abort and show summary? (w/a) [default: w]: ").strip().lower()
+                                    if ans == 'a':
+                                        folder_success = False
+                                        abort_all = True
+                                        break
                                     print(Fore.YELLOW + "  Waiting 60 seconds before retrying... (Change your VPN IP now to resume instantly!)")
                                     sleep(60)
                                 else:
@@ -270,6 +276,10 @@ if __name__ == "__main__":
                 else:
                     print(Fore.RED + f"\nFailed processing: {folder_name}")
                     stats['failed'] += 1
+                    
+                if abort_all:
+                    print(Fore.YELLOW + "\nAborting further processing per user request.")
+                    break
                     
             print(Fore.CYAN + "\n" + "="*30)
             print(Fore.CYAN + "Summary:")
