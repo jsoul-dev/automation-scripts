@@ -1,6 +1,12 @@
 import requests
 import json
 import mimetypes
+import sys
+
+# Force UTF-8 encoding for Windows console to support Japanese characters and emojis
+if sys.platform == 'win32':
+    sys.stdout.reconfigure(encoding='utf-8')
+
 import shutil
 from hashlib import md5
 from datetime import datetime as dt
