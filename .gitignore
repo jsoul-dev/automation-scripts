@@ -11,5 +11,5 @@ __pycache__/
 mkv-cleaner/Filtered
 hosts-blocker/hosts.txt
 tbh-decorator/tbh-save-backups/
-manga-translator/Downloads/
-manga-translator/tr/
+manga-translator/input/
+manga-translator/output/
