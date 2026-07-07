@@ -120,7 +120,8 @@ def translate(imagePath, slang='ja', tlang='en'):
 
 for f in listdir(folder):
   if not '.' in f: continue
-  translate(folder+f, src_lang, out_lang)
+  folder_path = folder if folder.endswith('/') else folder + '/'
+  translate(folder_path + f, src_lang, out_lang)
 
 
 
