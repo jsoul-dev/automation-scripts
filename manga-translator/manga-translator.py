@@ -157,27 +157,14 @@ if __name__ == "__main__":
             folders = [f for f in listdir(INPUT_DIR) if isdir(join(INPUT_DIR, f))]
             stats = {'processed': 0, 'skipped': 0, 'failed': 0}
             
-            # Clean up stale .tmp folders from previous crashes
-            for f in listdir(OUTPUT_DIR):
-                if f.endswith('.tmp'):
-                    tmp_path = join(OUTPUT_DIR, f)
-                    if isdir(tmp_path):
-                        shutil.rmtree(tmp_path)
-            
             for folder_name in folders:
                 folder_path = join(INPUT_DIR, folder_name)
                 output_folder_name = f"{folder_name} [MTL]"
                 output_folder_path = join(OUTPUT_DIR, output_folder_name)
-                tmp_folder_path = output_folder_path + ".tmp"
                 
-                if exists(output_folder_path):
-                    print(Fore.YELLOW + f"Skipping '{folder_name}' - already exists in output folder.")
-                    stats['skipped'] += 1
-                    continue
-                    
                 print(Fore.CYAN + f"\nProcessing: {folder_name}")
-                if not exists(tmp_folder_path):
-                    mkdir(tmp_folder_path)
+                if not exists(output_folder_path):
+                    mkdir(output_folder_path)
                 
                 files = [f for f in listdir(folder_path) if '.' in f]
                 files.sort(key=natural_sort_key)
@@ -188,10 +175,17 @@ if __name__ == "__main__":
                     continue
                     
                 folder_success = True
+                already_done_count = 0
                 for i, f in enumerate(files, 1):
+                    # Quick check before printing to avoid spamming the console for fully completed folders
+                    outPath = join(output_folder_path, basename(f))
+                    if exists(outPath):
+                        already_done_count += 1
+                        continue
+                        
                     print(Fore.CYAN + f"\n[{i}/{total_files}] ", end='')
                     try:
-                        translate(join(folder_path, f), tmp_folder_path, src_lang, out_lang)
+                        translate(join(folder_path, f), output_folder_path, src_lang, out_lang)
                     except KeyboardInterrupt:
                         raise
                     except Exception as e:
@@ -199,12 +193,14 @@ if __name__ == "__main__":
                         folder_success = False
                         break
                         
-                if folder_success:
-                    rename(tmp_folder_path, output_folder_path)
-                    print(Fore.GREEN + f"Successfully finished processing: {folder_name}")
+                if already_done_count == total_files:
+                    print(Fore.YELLOW + f"  Skipped (All {total_files} images already translated)")
+                    stats['skipped'] += 1
+                elif folder_success:
+                    print(Fore.GREEN + f"\nSuccessfully finished processing: {folder_name}")
                     stats['processed'] += 1
                 else:
-                    print(Fore.RED + f"Failed processing: {folder_name}")
+                    print(Fore.RED + f"\nFailed processing: {folder_name}")
                     stats['failed'] += 1
                     
             print(Fore.CYAN + "\n" + "="*30)
