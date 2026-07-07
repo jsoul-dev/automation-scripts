@@ -1,14 +1,16 @@
+import os
 import requests
 from datetime import datetime as dt
 from time import sleep
 import json
 import mimetypes
 from os import mkdir, listdir
-from os.path import exists
+from os.path import exists, join, isdir, basename
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 
-folder='Downloads/trtest'
+INPUT_DIR = 'input'
+OUTPUT_DIR = 'output'
 src_lang='ja'
 out_lang='en'
 
@@ -26,17 +28,15 @@ def getUserId():
   uid['cr']=3
   return user_id
 
-def translate(imagePath, slang='ja', tlang='en'):
-  base,fn=imagePath.rsplit('/',maxsplit=1)
+def translate(imagePath, outFolder, slang='ja', tlang='en'):
+  fn = basename(imagePath)
   mime=mimetypes.guess_type(imagePath)[0]
   # make sure it's an image'
-  if not mime.startswith('image'): return
+  if not mime or not mime.startswith('image'): return
 
-  print(fn)
+  print(f'  {fn}')
   # check already exists, if you want to redo just delete
-  if not exists(f'{base}/tr/'):
-    mkdir(f'{base}/tr/')
-  if exists(f'{base}/tr/{fn}'):
+  if exists(join(outFolder, fn)):
     print('  Done')
     return
 
@@ -114,14 +114,39 @@ def translate(imagePath, slang='ja', tlang='en'):
       if x==4: raise
       print(f"\r  Downloading {x+1}", end=' ', flush=True)
     else: break
-  with open(f'{base}/tr/{fn}','wb') as fh:
+  with open(join(outFolder, fn),'wb') as fh:
     fh.write(tri.content)
   print('Done')
 
-for f in listdir(folder):
-  if not '.' in f: continue
-  folder_path = folder if folder.endswith('/') else folder + '/'
-  translate(folder_path + f, src_lang, out_lang)
+if __name__ == "__main__":
+  if not exists(INPUT_DIR):
+    mkdir(INPUT_DIR)
+    print(f"Created '{INPUT_DIR}' directory. Please place your manga folders inside it and run the script again.")
+  if not exists(OUTPUT_DIR):
+    mkdir(OUTPUT_DIR)
+  
+  if exists(INPUT_DIR):
+    # Iterate over folders inside input
+    for folder_name in listdir(INPUT_DIR):
+      folder_path = join(INPUT_DIR, folder_name)
+      if not isdir(folder_path):
+        continue
+      
+      output_folder_name = f"{folder_name} [MTL]"
+      output_folder_path = join(OUTPUT_DIR, output_folder_name)
+      
+      if exists(output_folder_path):
+        print(f"Skipping '{folder_name}' - '{output_folder_name}' already exists in output folder.")
+        continue
+        
+      print(f"Processing: {folder_name}")
+      mkdir(output_folder_path)
+      
+      for f in listdir(folder_path):
+        if not '.' in f: continue
+        translate(join(folder_path, f), output_folder_path, src_lang, out_lang)
+      
+      print(f"Finished processing: {folder_name}\n")
 
 
 

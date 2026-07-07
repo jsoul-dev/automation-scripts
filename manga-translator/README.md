@@ -2,21 +2,26 @@
 An automated Python script that batch-translates raw manga pages from Japanese to English using the MangaTranslate API. 
 
 ## Version
-Current Version: **1.0.0**
+Current Version: **1.1.0**
 
 [![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=download)](https://github.com/jsoul-dev/automation-scripts/releases/latest/download/manga-translator.py)
 
-## Overview
-This script scans a directory for image files, uploads them to the online translator service, and downloads the cleaned, translated results into a `tr/` subfolder. It automatically manages API session credits and user IDs to ensure continuous bulk processing.
+## Requirements
+This script requires the `requests` library to make HTTP calls to the translation API.
+You can install it via pip:
+```bash
+pip install requests
+```
+
+## Usage
+1. Make sure you have python installed along with the `requests` library.
+2. Place `manga-translator.py` anywhere on your computer and double-click it (or run `python manga-translator.py`). 
+3. It will automatically generate an `input` and `output` folder next to the script.
+4. Drop your raw manga folders inside the `input` directory (e.g. `input/uzumaki/image1.png`).
+5. Run the script again. It will automatically scan all folders in the `input` directory, upload the images for translation, and save the English versions in the `output` directory under `[Folder Name] [MTL]`.
+6. If an output folder already exists for a manga, the script will skip it and proceed to the next folder.
 
 ## Features
 - **Batch Processing**: Automatically loops through all images in a specified folder.
 - **Session Management**: Automatically rotates temporary user sessions to bypass API credit limits.
-- **Resumption**: Skips over images that have already been translated and saved in the output directory.
-
-## Usage
-Simply run the python script:
-```bash
-python manga-translator.py
-```
-You can edit the `folder`, `src_lang`, and `out_lang` variables at the top of the script to customize its behavior.
+- **Resumption**: Skips over folders that have already been translated and saved in the output directory.
