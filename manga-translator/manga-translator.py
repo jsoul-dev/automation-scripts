@@ -30,7 +30,7 @@ def getUserId():
     if uid.get('cr', 0) > 0:
         return uid['user_id']
     user_id = f"temp_fp_{md5(str(dt.now().timestamp()).encode()).hexdigest()[:24]}"
-    print(Fore.CYAN + f'  [System] Generated new session ID: {user_id}')
+    print(Fore.CYAN + f'\n[System] Generated new session ID: {user_id}')
     uid['user_id'] = user_id
     uid['cr'] = 3
     return user_id
@@ -39,7 +39,7 @@ def natural_sort_key(s):
     import re
     return [int(text) if text.isdigit() else text.lower() for text in re.split('([0-9]+)', s)]
 
-def translate(imagePath, outFolder, slang='ja', tlang='en'):
+def translate(imagePath, outFolder, prefix="", slang='ja', tlang='en'):
     fn = basename(imagePath)
     mime = mimetypes.guess_type(imagePath)[0]
     
@@ -48,6 +48,8 @@ def translate(imagePath, outFolder, slang='ja', tlang='en'):
         
     outPath = join(outFolder, fn)
     if exists(outPath):
+        if prefix:
+            print(Fore.CYAN + f"\n{prefix}")
         print(Fore.YELLOW + '  Done (Skipped - already exists)')
         return True
 
@@ -57,6 +59,9 @@ def translate(imagePath, outFolder, slang='ja', tlang='en'):
 
     user_id = getUserId()
     csrf = f"{int(user_id[-24:], 16)}"
+    
+    if prefix:
+        print(Fore.CYAN + f"\n{prefix}")
 
     r = ses.get(f'https://www.mangatranslate.com/api/v1/credits/get_credits/{user_id}', headers=headers, cookies={'csrftoken': csrf})
     cr = r.json().get('data', {}).get('total_credits', 0)
@@ -183,9 +188,8 @@ if __name__ == "__main__":
                         already_done_count += 1
                         continue
                         
-                    print(Fore.CYAN + f"\n[{i}/{total_files}] ", end='')
                     try:
-                        translate(join(folder_path, f), output_folder_path, src_lang, out_lang)
+                        translate(join(folder_path, f), output_folder_path, prefix=f"[{i}/{total_files}]", slang=src_lang, tlang=out_lang)
                     except KeyboardInterrupt:
                         raise
                     except Exception as e:
@@ -194,7 +198,7 @@ if __name__ == "__main__":
                         break
                         
                 if already_done_count == total_files:
-                    print(Fore.YELLOW + f"  Skipped (All {total_files} images already translated)")
+                    print(Fore.YELLOW + f"\n  Skipped (All {total_files} images already translated)")
                     stats['skipped'] += 1
                 elif folder_success:
                     print(Fore.GREEN + f"\nSuccessfully finished processing: {folder_name}")
