@@ -23,7 +23,7 @@ except ImportError:
             return ""
     Fore = Style = DummyColor()
 
-__version__ = "2.0.0"
+__version__ = "2.0.1"
 
 INPUT_DIR = 'input'
 OUTPUT_DIR = 'output'
