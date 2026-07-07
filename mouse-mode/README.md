@@ -2,14 +2,13 @@
 A lightweight system tray utility written in AutoHotkey (v2) that allows you to instantly switch the behavior of your mouse's side buttons (XButton1 / XButton2). 
 
 ## Version
-Current Version: **1.0.0**
+Current Version: **1.1.0**
 
 [![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=download)](https://github.com/jsoul-dev/automation-scripts/releases/latest/download/mouse-mode.ahk)
 
 ## Features
 - **Browser Mode (Default)**: Passes buttons straight through natively, ensuring low latency. 
 - **Media Mode**: Converts the side buttons into Left/Right arrow keys for seeking in video and audio players.
-- **Native Mode**: Identical to Browser mode. Allows Browser mode to grow extra behaviors while keeping Native untouched.
 
 ## Usage
 You can switch modes via:

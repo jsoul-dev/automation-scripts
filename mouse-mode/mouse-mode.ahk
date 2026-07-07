@@ -13,12 +13,6 @@
 ;                             no synthetic key events.
 ;   Media Mode              - buttons become Left/Right arrow keys, handy
 ;                             for seeking in video/audio players.
-;   Native Mode              - identical to Browser Mode at the button level
-;                             (no interception at all); kept as its own
-;                             clearly-labelled option for games and
-;                             troubleshooting, and so Browser Mode is free to
-;                             grow extra behavior later without disturbing
-;                             Native Mode's "hands off, always" guarantee.
 ;
 ; Switch modes via the tray menu, by double-clicking the tray icon, or with
 ; the global hotkey Ctrl+Win+M. The current mode and the "Run at Startup"
@@ -31,7 +25,7 @@
 ; ============================================================================
 
 APP_NAME    := "Mouse Mode Switcher"
-APP_VERSION := "1.0.0"
+APP_VERSION := "1.1.0"
 
 ; --- Modes ---------------------------------------------------------------
 ; MODE_ORDER controls both the tray menu's display order and the order
@@ -39,13 +33,11 @@ APP_VERSION := "1.0.0"
 ; used in the tray menu, notifications, and the About dialog.
 MODE_BROWSER := "Browser"
 MODE_MEDIA   := "Media"
-MODE_NATIVE  := "Native"
-MODE_ORDER   := [MODE_BROWSER, MODE_MEDIA, MODE_NATIVE]
+MODE_ORDER   := [MODE_BROWSER, MODE_MEDIA]
 CYCLE_ORDER  := [MODE_BROWSER, MODE_MEDIA]
 MODE_LABELS  := Map(
     MODE_BROWSER, "Browser Mode",
-    MODE_MEDIA,   "Media Mode",
-    MODE_NATIVE,  "Native Mode"
+    MODE_MEDIA,   "Media Mode"
 )
 DEFAULT_MODE := MODE_BROWSER
 
@@ -73,7 +65,6 @@ INI_PATH := A_ScriptDir "\mouse-mode.ini"
 ;@Ahk2Exe-SetMainIcon icons\main.ico
 ;@Ahk2Exe-AddResource icons\browser.ico, 101
 ;@Ahk2Exe-AddResource icons\media.ico, 102
-;@Ahk2Exe-AddResource icons\native.ico, 103
 
 ; --- Tray icons ------------------------------------------------------------
 if A_IsCompiled {
@@ -81,15 +72,11 @@ if A_IsCompiled {
     ICON_INDEX_BROWSER := -101
     ICON_FILE_MEDIA    := A_ScriptFullPath
     ICON_INDEX_MEDIA   := -102
-    ICON_FILE_NATIVE   := A_ScriptFullPath
-    ICON_INDEX_NATIVE  := -103
 } else {
     ICON_FILE_BROWSER  := A_ScriptDir "\icons\browser.ico"
     ICON_INDEX_BROWSER := 1
     ICON_FILE_MEDIA    := A_ScriptDir "\icons\media.ico"
     ICON_INDEX_MEDIA   := 1
-    ICON_FILE_NATIVE   := A_ScriptDir "\icons\native.ico"
-    ICON_INDEX_NATIVE  := 1
 }
 
 ; --- Tray menu item labels (kept as constants so every Add/Check/Default
@@ -134,7 +121,7 @@ TrayIconMessage(wParam, lParam, msg, hwnd) {
 ; Global mode-cycle hotkey - works no matter which mode is currently active.
 ^#m::CycleMode()
 
-; Media Mode remap ONLY. Browser Mode and Native Mode deliberately have NO
+; Media Mode remap ONLY. Browser Mode deliberately has NO
 ; hotkey definition for XButton1/XButton2 anywhere in this file. Confirmed
 ; AutoHotkey behavior: when a hotkey's #HotIf condition is false, "it
 ; performs its native function; that is, it passes through to the active
@@ -198,8 +185,6 @@ BuildTray() {
 
     ; Mode selection
     for modeKey in MODE_ORDER {
-        if (modeKey = MODE_NATIVE)
-            tray.Add()   ; separator before Native
         tray.Add(MODE_LABELS[modeKey], SetMode.Bind(modeKey, true))
     }
     tray.Add()   ; separator
@@ -247,8 +232,6 @@ UpdateTrayIcon() {
             TraySetIcon(ICON_FILE_BROWSER, ICON_INDEX_BROWSER)
         else if (CurrentMode = MODE_MEDIA)
             TraySetIcon(ICON_FILE_MEDIA, ICON_INDEX_MEDIA)
-        else if (CurrentMode = MODE_NATIVE)
-            TraySetIcon(ICON_FILE_NATIVE, ICON_INDEX_NATIVE)
     } catch {
         ; Never let icon trouble take the script down.
     }
@@ -434,7 +417,7 @@ ExitApplication(*) {
 ; ----------------------------------------------------------------------------
 ; 1. Add a constant and push it into MODE_ORDER:
 ;        MODE_VOLUME := "Volume"
-;        MODE_ORDER  := [MODE_BROWSER, MODE_MEDIA, MODE_NATIVE, MODE_VOLUME]
+;        MODE_ORDER  := [MODE_BROWSER, MODE_MEDIA, MODE_VOLUME]
 ; 2. Add its label:  MODE_LABELS[MODE_VOLUME] := "Volume Mode"
 ; 3. Add ICON_FILE_VOLUME / ICON_INDEX_VOLUME constants, plus one more
 ;    "else if" line in UpdateTrayIcon().
