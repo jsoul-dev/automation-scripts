@@ -1,12 +1,14 @@
 @echo off
 setlocal enabledelayedexpansion
 
+set "VERSION=2.0.0"
+
 color 0a
-title WIFI CREDENTIAL EXTRACTOR v2.0
+title WIFI CREDENTIAL EXTRACTOR v%VERSION%
 cls
 
 echo.
-echo  WIFI CREDENTIAL EXTRACTOR v2.0
+echo  WIFI CREDENTIAL EXTRACTOR v%VERSION%
 echo  ------------------------------
 echo.
 echo [*] Querying Windows WLAN API for cached profiles...

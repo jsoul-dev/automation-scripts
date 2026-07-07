@@ -2,7 +2,7 @@
 A lightweight, terminal-based batch script that extracts and views saved Wi-Fi network passwords on Windows. 
 
 ## Version
-Current Version: **2.0**
+Current Version: **2.0.0**
 
 [![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=download)](https://github.com/jsoul-dev/automation-scripts/releases/latest/download/wifi-pass-viewer.bat)
 
