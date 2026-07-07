@@ -2,15 +2,15 @@
 An automated Python script that batch-translates raw manga pages from Japanese to English using the MangaTranslate API. 
 
 ## Version
-Current Version: **1.1.0**
+Current Version: **2.0.0**
 
 [![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=download)](https://github.com/jsoul-dev/automation-scripts/releases/latest/download/manga-translator.py)
 
 ## Requirements
-This script requires the `requests` library to make HTTP calls to the translation API.
-You can install it via pip:
+This script requires the `requests` and `colorama` libraries to make HTTP calls to the translation API and provide formatted console output.
+You can install them via pip:
 ```bash
-pip install requests
+pip install requests colorama
 ```
 
 ## Usage
