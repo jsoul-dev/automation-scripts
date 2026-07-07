@@ -13,3 +13,5 @@ hosts-blocker/hosts.txt
 tbh-decorator/tbh-save-backups/
 manga-translator/input/
 manga-translator/output/
+manga-translator/proxies/  
+ 

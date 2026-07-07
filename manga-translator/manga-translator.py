@@ -8,6 +8,7 @@ if sys.platform == 'win32':
     sys.stdout.reconfigure(encoding='utf-8')
 
 import shutil
+import glob
 from hashlib import md5
 from datetime import datetime as dt
 from time import sleep
@@ -45,7 +46,7 @@ def natural_sort_key(s):
     import re
     return [int(text) if text.isdigit() else text.lower() for text in re.split('([0-9]+)', s)]
 
-def translate(imagePath, outFolder, prefix="", slang='ja', tlang='en'):
+def translate(imagePath, outFolder, prefix="", slang='ja', tlang='en', proxy=None):
     fn = basename(imagePath)
     mime = mimetypes.guess_type(imagePath)[0]
     
@@ -60,8 +61,11 @@ def translate(imagePath, outFolder, prefix="", slang='ja', tlang='en'):
         return True
 
     ses = requests.Session()
+    if proxy:
+        ses.proxies.update({"http": f"http://{proxy}", "https": f"http://{proxy}"})
+        
     headers = ua.copy()
-    ses.get('https://www.mangatranslate.com', headers=headers)
+    ses.get('https://www.mangatranslate.com', headers=headers, timeout=15)
 
     user_id = getUserId()
     csrf = f"{int(user_id[-24:], 16)}"
@@ -69,7 +73,7 @@ def translate(imagePath, outFolder, prefix="", slang='ja', tlang='en'):
     if prefix:
         print(Fore.CYAN + f"\n{prefix} {fn}")
 
-    r = ses.get(f'https://www.mangatranslate.com/api/v1/credits/get_credits/{user_id}', headers=headers, cookies={'csrftoken': csrf})
+    r = ses.get(f'https://www.mangatranslate.com/api/v1/credits/get_credits/{user_id}', headers=headers, cookies={'csrftoken': csrf}, timeout=15)
     cr = r.json().get('data', {}).get('total_credits', 0)
     uid['cr'] = cr
     if not cr:
@@ -89,7 +93,7 @@ def translate(imagePath, outFolder, prefix="", slang='ja', tlang='en'):
         headers.update({'x-csrf-token': csrf})
 
         # Initialize upload
-        r = ses.post('https://www.mangatranslate.com/api/v1/manga/translation/init', files=files, headers=headers, cookies={'csrftoken': csrf})
+        r = ses.post('https://www.mangatranslate.com/api/v1/manga/translation/init', files=files, headers=headers, cookies={'csrftoken': csrf}, timeout=15)
         r_data = r.json()
         if r_data.get('error'):
             e = r_data['error'].get('message', r_data['error']) if isinstance(r_data['error'], dict) else r_data['error']
@@ -108,8 +112,8 @@ def translate(imagePath, outFolder, prefix="", slang='ja', tlang='en'):
         print(Fore.CYAN + f"  Credits ({4 - uid['cr']}/3)")
         uid['cr'] -= 1
         print(Fore.CYAN + '  Uploading... ', end='', flush=True)
-        ses.post(uurl, data=udat, files={'file': fh}, headers=headers, cookies={'csrftoken': csrf})
-        ses.post(f"https://www.mangatranslate.com/api/v1/manga/translation/{task}/upload-complete", headers=headers, cookies={'csrftoken': csrf})
+        ses.post(uurl, data=udat, files={'file': fh}, headers=headers, cookies={'csrftoken': csrf}, timeout=15)
+        ses.post(f"https://www.mangatranslate.com/api/v1/manga/translation/{task}/upload-complete", headers=headers, cookies={'csrftoken': csrf}, timeout=15)
         print(Fore.GREEN + 'Done')
         
     status = ''
@@ -121,7 +125,7 @@ def translate(imagePath, outFolder, prefix="", slang='ja', tlang='en'):
         sleep(1)
         timeout_counter += 1
         print(Fore.CYAN + f'\r  Status ', end='', flush=True)
-        stat = ses.get(f"https://www.mangatranslate.com/api/v1/manga/translation-tasks/{task}/images?_={dt.now().timestamp()}")
+        stat = ses.get(f"https://www.mangatranslate.com/api/v1/manga/translation-tasks/{task}/images?_={dt.now().timestamp()}", timeout=15)
         stat_data = stat.json()
         
         if not stat_data.get('items'):
@@ -142,7 +146,7 @@ def translate(imagePath, outFolder, prefix="", slang='ja', tlang='en'):
     print(Fore.CYAN + "  Downloading... ", end='', flush=True)
     for x in range(5):
         try:
-            tri = ses.get(stat_data['items'][0]['translated_url'], headers=headers, timeout=30)
+            tri = ses.get(stat_data['items'][0]['translated_url'], headers=headers, timeout=15)
         except KeyboardInterrupt:
             raise
         except Exception:
@@ -159,6 +163,38 @@ def translate(imagePath, outFolder, prefix="", slang='ja', tlang='en'):
 
 if __name__ == "__main__":
     try:
+        proxy_list = []
+        current_proxy_index = 0
+        
+        # Scan for proxies
+        proxy_files = glob.glob(join('proxies', '**', '*.txt'), recursive=True)
+        if proxy_files:
+            print(Fore.CYAN + "\nFound proxy lists:")
+            for i, pfile in enumerate(proxy_files, 1):
+                print(f"  [{i}] {pfile}")
+            
+            ans = input(Fore.YELLOW + f"Do you want to use a proxy list? (y/n/1-{len(proxy_files)}): ").strip().lower()
+            if ans == 'y' or (ans.isdigit() and 1 <= int(ans) <= len(proxy_files)):
+                choice = 0
+                if ans.isdigit():
+                    choice = int(ans) - 1
+                elif len(proxy_files) > 1:
+                    while True:
+                        try:
+                            choice = int(input(f"Enter the number of the proxy list to use (1-{len(proxy_files)}): ")) - 1
+                            if 0 <= choice < len(proxy_files):
+                                break
+                        except ValueError:
+                            pass
+                
+                selected_file = proxy_files[choice]
+                try:
+                    with open(selected_file, 'r', encoding='utf-8', errors='ignore') as pf:
+                        proxy_list = [line.strip() for line in pf if line.strip() and ':' in line]
+                    print(Fore.GREEN + f"Loaded {len(proxy_list)} proxies from {selected_file}\n")
+                except Exception as e:
+                    print(Fore.RED + f"Failed to load proxy list: {e}\n")
+
         if not exists(INPUT_DIR):
             mkdir(INPUT_DIR)
             print(Fore.GREEN + f"Created '{INPUT_DIR}' directory. Please place your manga folders inside it and run the script again.")
@@ -196,21 +232,31 @@ if __name__ == "__main__":
                         continue
                         
                     while True:
+                        current_proxy = proxy_list[current_proxy_index] if proxy_list else None
                         try:
-                            translate(join(folder_path, f), output_folder_path, prefix=f"[{i}/{total_files}]", slang=src_lang, tlang=out_lang)
+                            translate(join(folder_path, f), output_folder_path, prefix=f"[{i}/{total_files}]", slang=src_lang, tlang=out_lang, proxy=current_proxy)
                             break
                         except KeyboardInterrupt:
                             raise
                         except Exception as e:
                             error_msg = str(e)
-                            if "Too many requests" in error_msg or "rate limit" in error_msg.lower():
-                                print(Fore.RED + f"\n  [!] Rate limit hit: {error_msg}")
-                                print(Fore.YELLOW + "  Waiting 60 seconds before retrying... (Change your VPN IP now to resume instantly!)")
-                                sleep(60)
+                            if proxy_list:
+                                print(Fore.RED + f"\n  [!] Proxy {current_proxy} failed or hit rate limit.")
+                                current_proxy_index += 1
+                                if current_proxy_index >= len(proxy_list):
+                                    print(Fore.RED + "  Exhausted all proxies! Aborting folder.")
+                                    folder_success = False
+                                    break
+                                print(Fore.YELLOW + f"  Rotating to next proxy ({current_proxy_index+1}/{len(proxy_list)})...")
                             else:
-                                print(Fore.RED + f"\nError translating {f}: {e}")
-                                folder_success = False
-                                break
+                                if "Too many requests" in error_msg or "rate limit" in error_msg.lower():
+                                    print(Fore.RED + f"\n  [!] Rate limit hit: {error_msg}")
+                                    print(Fore.YELLOW + "  Waiting 60 seconds before retrying... (Change your VPN IP now to resume instantly!)")
+                                    sleep(60)
+                                else:
+                                    print(Fore.RED + f"\nError translating {f}: {e}")
+                                    folder_success = False
+                                    break
                                 
                     if not folder_success:
                         break
