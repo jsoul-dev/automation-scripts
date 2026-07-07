@@ -49,7 +49,7 @@ def translate(imagePath, outFolder, prefix="", slang='ja', tlang='en'):
     outPath = join(outFolder, fn)
     if exists(outPath):
         if prefix:
-            print(Fore.CYAN + f"\n{prefix}")
+            print(Fore.CYAN + f"\n{prefix} {fn}")
         print(Fore.YELLOW + '  Done (Skipped - already exists)')
         return True
 
@@ -61,7 +61,7 @@ def translate(imagePath, outFolder, prefix="", slang='ja', tlang='en'):
     csrf = f"{int(user_id[-24:], 16)}"
     
     if prefix:
-        print(Fore.CYAN + f"\n{prefix}")
+        print(Fore.CYAN + f"\n{prefix} {fn}")
 
     r = ses.get(f'https://www.mangatranslate.com/api/v1/credits/get_credits/{user_id}', headers=headers, cookies={'csrftoken': csrf})
     cr = r.json().get('data', {}).get('total_credits', 0)
@@ -99,6 +99,7 @@ def translate(imagePath, outFolder, prefix="", slang='ja', tlang='en'):
         fh.seek(0)
 
         # Upload
+        print(Fore.CYAN + f"  Credits ({uid['cr']}/3)")
         uid['cr'] -= 1
         print(Fore.CYAN + '  Uploading... ', end='', flush=True)
         ses.post(uurl, data=udat, files={'file': fh}, headers=headers, cookies={'csrftoken': csrf})
@@ -188,13 +189,24 @@ if __name__ == "__main__":
                         already_done_count += 1
                         continue
                         
-                    try:
-                        translate(join(folder_path, f), output_folder_path, prefix=f"[{i}/{total_files}]", slang=src_lang, tlang=out_lang)
-                    except KeyboardInterrupt:
-                        raise
-                    except Exception as e:
-                        print(Fore.RED + f"\nError translating {f}: {e}")
-                        folder_success = False
+                    while True:
+                        try:
+                            translate(join(folder_path, f), output_folder_path, prefix=f"[{i}/{total_files}]", slang=src_lang, tlang=out_lang)
+                            break
+                        except KeyboardInterrupt:
+                            raise
+                        except Exception as e:
+                            error_msg = str(e)
+                            if "Too many requests" in error_msg or "rate limit" in error_msg.lower():
+                                print(Fore.RED + f"\n  [!] Rate limit hit: {error_msg}")
+                                print(Fore.YELLOW + "  Waiting 60 seconds before retrying... (Change your VPN IP now to resume instantly!)")
+                                sleep(60)
+                            else:
+                                print(Fore.RED + f"\nError translating {f}: {e}")
+                                folder_success = False
+                                break
+                                
+                    if not folder_success:
                         break
                         
                 if already_done_count == total_files:
