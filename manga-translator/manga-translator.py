@@ -24,7 +24,7 @@ except ImportError:
             return ""
     Fore = Style = DummyColor()
 
-__version__ = "2.0.2"
+__version__ = "2.0.3"
 
 INPUT_DIR = 'input'
 OUTPUT_DIR = 'output'
@@ -214,7 +214,24 @@ if __name__ == "__main__":
                 selected_file = proxy_files[choice]
                 try:
                     with open(selected_file, 'r', encoding='utf-8', errors='ignore') as pf:
-                        proxy_list = [line.strip() for line in pf if line.strip() and ':' in line]
+                        for line in pf:
+                            line = line.strip()
+                            if not line or line.lower().startswith(('ip,', '"ip"')): continue
+                            
+                            # Handle Geonode-style CSV formats (ip is index 0, port is index 7)
+                            if line.startswith('"') and '","' in line:
+                                parts = line.replace('"', '').split(',')
+                                if len(parts) >= 8:
+                                    ip, port = parts[0], parts[7]
+                                    if ip.replace('.', '').isdigit() and port.isdigit():
+                                        proxy_list.append(f"{ip}:{port}")
+                                        continue
+                                        
+                            # Standard proxy list formats (IP:PORT or user:pass@IP:PORT)
+                            # Avoid lines with spaces or HTML tags to prevent loading garbage
+                            if ':' in line and ' ' not in line and '<' not in line:
+                                proxy_list.append(line)
+                                
                     print(Fore.GREEN + f"Loaded {len(proxy_list)} proxies from {selected_file}\n")
                 except Exception as e:
                     print(Fore.RED + f"Failed to load proxy list: {e}\n")
