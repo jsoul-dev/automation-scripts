@@ -316,6 +316,7 @@ if __name__ == "__main__":
                     print(Fore.YELLOW + "  No files found.")
                     if item_type == 'archive':
                         shutil.rmtree(source_dir, ignore_errors=True)
+                    shutil.rmtree(output_dir, ignore_errors=True)
                     continue
                     
                 folder_success = True
