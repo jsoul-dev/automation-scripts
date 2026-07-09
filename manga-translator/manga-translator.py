@@ -24,17 +24,41 @@ except ImportError:
             return ""
     Fore = Style = DummyColor()
 
-__version__ = "2.0.1"
+__version__ = "2.0.2"
 
 INPUT_DIR = 'input'
 OUTPUT_DIR = 'output'
 src_lang = 'ja'
 out_lang = 'en'
+font = 'auto'
+model = 'CTD'
+
+# === Font Options ===
+# "auto"                   Automatic
+# "anime_ace"              Anime Ace
+# "anime_ace_3"            Anime Ace v3
+# "arial_unicode"          Arial Unicode
+# "comic_shanns"           Comic Shanns
+# "msgothic"               MS Gothic
+# "msyh"                   Microsoft YaHei
+# "toneoz_tc"              ToneOZ Tsuipita TC
+# "klee_one"               Klee One
+# "smiley_sans_oblique"    Smiley Sans Oblique
+# "noto_serif_cjk_kr"      Noto Serif CJK KR
+
+# === Model Options ===
+# "CTD"     Comic Text Detector [Advanced manga text detection with high accuracy]
+# "CTD2"    Complex Text Detector [Best for complex layouts]
+# "HTD"     Hybrid Text Detector [Hybrid detector for multilingual and mixed-layout text]
+# "QLY"     EagleEye [Best for clean text removal and redraw-ready output]
+# "default" Default OCR [Basic OCR suitable for clear text]
+
 ua = {'User-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36'}
 uid = {}
+usecr = {'CTD2': 2, 'HTD': 2}
 
 def getUserId():
-    if uid.get('cr', 0) > 0:
+    if uid.get('cr', 0) >= usecr.get(model, 1):
         return uid['user_id']
     user_id = f"temp_fp_{md5(str(dt.now().timestamp()).encode()).hexdigest()[:24]}"
     print(Fore.CYAN + f'\n[System] Generated new session ID: {user_id}')
@@ -84,8 +108,8 @@ def translate(imagePath, outFolder, prefix="", slang='ja', tlang='en', proxy=Non
         idat = {
             'user_id': user_id,
             'task_name': dt.now().strftime('task-%Y-%m-%d-%H-%M-%S'),
-            'source_language': slang, 'target_language': tlang, 'recognition_model': 'CTD',
-            'font_style': 'auto', 'font_weight': 'normal', 'spacing_x': '0', 'spacing_y': '0.15',
+            'source_language': slang, 'target_language': tlang, 'recognition_model': model,
+            'font_style': font, 'font_weight': 'normal', 'spacing_x': '0', 'spacing_y': '0.15',
             'text_direction_preference': 'auto', 'expected_total': '1',
             'files': json.dumps([{"index": 0, "filename": fn, "content_type": mime, "size": len(fh.read())}]),
         }
@@ -109,8 +133,8 @@ def translate(imagePath, outFolder, prefix="", slang='ja', tlang='en', proxy=Non
         fh.seek(0)
 
         # Upload
-        print(Fore.CYAN + f"  Credits ({4 - uid['cr']}/3)")
-        uid['cr'] -= 1
+        uid['cr'] -= usecr.get(model, 1)
+        print(Fore.CYAN + f"  Credits (Remaining: {uid['cr']}/3)")
         print(Fore.CYAN + '  Uploading... ', end='', flush=True)
         ses.post(uurl, data=udat, files={'file': fh}, headers=headers, cookies={'csrftoken': csrf}, timeout=15)
         ses.post(f"https://www.mangatranslate.com/api/v1/manga/translation/{task}/upload-complete", headers=headers, cookies={'csrftoken': csrf}, timeout=15)
