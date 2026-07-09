@@ -24,7 +24,7 @@ except ImportError:
             return ""
     Fore = Style = DummyColor()
 
-__version__ = "2.0.3"
+__version__ = "2.0.4"
 
 INPUT_DIR = 'input'
 OUTPUT_DIR = 'output'
@@ -133,8 +133,9 @@ def translate(imagePath, outFolder, prefix="", slang='ja', tlang='en', proxy=Non
         fh.seek(0)
 
         # Upload
-        uid['cr'] -= usecr.get(model, 1)
-        print(Fore.CYAN + f"  Credits (Remaining: {uid['cr']}/3)")
+        cost = usecr.get(model, 1)
+        uid['cr'] -= cost
+        print(Fore.CYAN + f"  Credits ({4 - uid['cr'] - cost}/3)")
         print(Fore.CYAN + '  Uploading... ', end='', flush=True)
         ses.post(uurl, data=udat, files={'file': fh}, headers=headers, cookies={'csrftoken': csrf}, timeout=15)
         ses.post(f"https://www.mangatranslate.com/api/v1/manga/translation/{task}/upload-complete", headers=headers, cookies={'csrftoken': csrf}, timeout=15)
@@ -289,7 +290,7 @@ if __name__ == "__main__":
                                     print(Fore.RED + "  Exhausted all proxies! Aborting folder.")
                                     folder_success = False
                                     break
-                                print(Fore.YELLOW + f"  Rotating to next proxy ({current_proxy_index+1}/{len(proxy_list)})...")
+                                print(Fore.YELLOW + f"  Rotating to next proxy ({current_proxy_index}/{len(proxy_list)})...")
                             else:
                                 if "Too many requests" in error_msg or "rate limit" in error_msg.lower():
                                     print(Fore.RED + f"\n  [!] Rate limit hit: {error_msg}")
