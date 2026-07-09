@@ -24,7 +24,7 @@ except ImportError:
             return ""
     Fore = Style = DummyColor()
 
-__version__ = "2.0.4"
+__version__ = "2.0.5"
 
 INPUT_DIR = 'input'
 OUTPUT_DIR = 'output'
@@ -233,9 +233,9 @@ if __name__ == "__main__":
                             if ':' in line and ' ' not in line and '<' not in line:
                                 proxy_list.append(line)
                                 
-                    print(Fore.GREEN + f"Loaded {len(proxy_list)} proxies from {selected_file}\n")
+                    print(Fore.GREEN + f"Loaded {len(proxy_list)} proxies from {selected_file}")
                 except Exception as e:
-                    print(Fore.RED + f"Failed to load proxy list: {e}\n")
+                    print(Fore.RED + f"Failed to load proxy list: {e}")
 
         if not exists(INPUT_DIR):
             mkdir(INPUT_DIR)
