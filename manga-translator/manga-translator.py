@@ -1,20 +1,15 @@
-import requests
-import json
-import mimetypes
 import sys
-
-# Force UTF-8 encoding for Windows console to support Japanese characters and emojis
-if sys.platform == 'win32':
-    sys.stdout.reconfigure(encoding='utf-8')
-
 import shutil
 import glob
+import json
+import mimetypes
 from hashlib import md5
 from datetime import datetime as dt
 from time import sleep
 from os import mkdir, listdir, rename
 from os.path import exists, join, isdir, basename
 
+import requests
 try:
     from colorama import init, Fore, Style
     init(autoreset=True)
@@ -24,7 +19,11 @@ except ImportError:
             return ""
     Fore = Style = DummyColor()
 
-__version__ = "2.0.6"
+# Force UTF-8 encoding for Windows console to support Japanese characters and emojis
+if sys.platform == 'win32':
+    sys.stdout.reconfigure(encoding='utf-8')
+
+__version__ = "2.0.7"
 
 INPUT_DIR = 'input'
 OUTPUT_DIR = 'output'
