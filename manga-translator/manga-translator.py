@@ -268,6 +268,12 @@ if __name__ == "__main__":
                 if exists(final_archive_path):
                     print(Fore.YELLOW + f"\nSkipped (Already translated archive): {basename(item_path)}")
                     stats['skipped'] += 1
+                    if DELETE_INPUT_ON_SUCCESS:
+                        print(Fore.CYAN + f"  Deleting raw input since output already exists: {basename(item_path)}...")
+                        if isdir(item_path):
+                            shutil.rmtree(item_path, ignore_errors=True)
+                        else:
+                            os.remove(item_path)
                     continue
                     
                 print(Fore.CYAN + f"\nProcessing: {basename(item_path)}")
@@ -370,11 +376,12 @@ if __name__ == "__main__":
                     if not folder_success:
                         break
                         
-                if already_done_count == total_files:
-                    print(Fore.YELLOW + f"\n  Skipped (All {total_files} images already translated)")
-                    stats['skipped'] += 1
-                elif folder_success:
-                    print(Fore.GREEN + f"\nSuccessfully finished processing: {basename(item_path)}")
+                if folder_success:
+                    if already_done_count == total_files:
+                        print(Fore.YELLOW + f"\n  All {total_files} images already translated in temp workspace. Packaging...")
+                    else:
+                        print(Fore.GREEN + f"\nSuccessfully finished processing: {basename(item_path)}")
+                        
                     stats['processed'] += 1
                     
                     print(Fore.CYAN + f"  Packaging into .cbz...")
