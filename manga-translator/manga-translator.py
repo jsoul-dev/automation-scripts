@@ -3,6 +3,7 @@ import shutil
 import glob
 import json
 import mimetypes
+import zipfile
 from hashlib import md5
 from datetime import datetime as dt
 from time import sleep
@@ -23,10 +24,11 @@ except ImportError:
 if sys.platform == 'win32':
     sys.stdout.reconfigure(encoding='utf-8')
 
-__version__ = "2.0.7"
+__version__ = "2.0.8"
 
 INPUT_DIR = 'input'
 OUTPUT_DIR = 'output'
+TEMP_DIR = '.temp'
 src_lang = 'ja'
 out_lang = 'en'
 font = 'auto'
@@ -243,32 +245,84 @@ if __name__ == "__main__":
             mkdir(OUTPUT_DIR)
         
         if exists(INPUT_DIR):
-            folders = [f for f in listdir(INPUT_DIR) if isdir(join(INPUT_DIR, f))]
+            items = []
+            for f in listdir(INPUT_DIR):
+                p = join(INPUT_DIR, f)
+                if isdir(p):
+                    items.append((p, 'dir'))
+                elif f.lower().endswith(('.zip', '.cbz')):
+                    items.append((p, 'archive'))
+                    
             stats = {'processed': 0, 'skipped': 0, 'failed': 0}
             
-            for folder_name in folders:
-                folder_path = join(INPUT_DIR, folder_name)
-                output_folder_name = f"{folder_name} [MTL]"
-                output_folder_path = join(OUTPUT_DIR, output_folder_name)
+            for item_path, item_type in items:
+                base_name = basename(item_path)
+                if item_type == 'archive':
+                    base_name = os.path.splitext(base_name)[0]
+                    
+                output_folder_name = f"{base_name} [MTL]"
+                final_archive_path = join(OUTPUT_DIR, f"{output_folder_name}.cbz")
                 
-                print(Fore.CYAN + f"\nProcessing: {folder_name}")
-                if not exists(output_folder_path):
-                    mkdir(output_folder_path)
+                # Check skip
+                if item_type == 'archive' and exists(final_archive_path):
+                    print(Fore.YELLOW + f"\nSkipped (Already translated archive): {basename(item_path)}")
+                    stats['skipped'] += 1
+                    continue
+                    
+                print(Fore.CYAN + f"\nProcessing: {basename(item_path)}")
                 
-                files = [f for f in listdir(folder_path) if '.' in f]
+                if item_type == 'archive':
+                    if not exists(TEMP_DIR):
+                        mkdir(TEMP_DIR)
+                    source_dir = join(TEMP_DIR, f"{base_name}_extract")
+                    output_dir = join(TEMP_DIR, output_folder_name)
+                    
+                    if not exists(source_dir):
+                        mkdir(source_dir)
+                        print(Fore.CYAN + f"  Extracting archive...")
+                        try:
+                            with zipfile.ZipFile(item_path, 'r') as zip_ref:
+                                zip_ref.extractall(source_dir)
+                        except Exception as e:
+                            print(Fore.RED + f"  Failed to extract archive: {e}")
+                            stats['failed'] += 1
+                            continue
+                else:
+                    source_dir = item_path
+                    output_dir = join(OUTPUT_DIR, output_folder_name)
+                    
+                if not exists(output_dir):
+                    os.makedirs(output_dir)
+                    
+                # Collect files recursively
+                files = []
+                for root, _, fnames in os.walk(source_dir):
+                    for fn in fnames:
+                        if '.' in fn:
+                            rel_p = os.path.relpath(join(root, fn), source_dir)
+                            files.append(rel_p)
+                            
                 files.sort(key=natural_sort_key)
-                
                 total_files = len(files)
+                
                 if total_files == 0:
-                    print(Fore.YELLOW + "  No files found in folder.")
+                    print(Fore.YELLOW + "  No files found.")
+                    if item_type == 'archive':
+                        shutil.rmtree(source_dir, ignore_errors=True)
                     continue
                     
                 folder_success = True
                 already_done_count = 0
                 abort_all = False
+                
                 for i, f in enumerate(files, 1):
-                    # Quick check before printing to avoid spamming the console for fully completed folders
-                    outPath = join(output_folder_path, basename(f))
+                    inPath = join(source_dir, f)
+                    outPath = join(output_dir, f)
+                    
+                    out_subfolder = os.path.dirname(outPath)
+                    if not exists(out_subfolder):
+                        os.makedirs(out_subfolder)
+                        
                     if exists(outPath):
                         already_done_count += 1
                         continue
@@ -276,7 +330,7 @@ if __name__ == "__main__":
                     while True:
                         current_proxy = proxy_list[current_proxy_index] if proxy_list else None
                         try:
-                            translate(join(folder_path, f), output_folder_path, prefix=f"[{i}/{total_files}]", slang=src_lang, tlang=out_lang, proxy=current_proxy)
+                            translate(inPath, out_subfolder, prefix=f"[{i}/{total_files}]", slang=src_lang, tlang=out_lang, proxy=current_proxy)
                             break
                         except KeyboardInterrupt:
                             raise
@@ -301,7 +355,7 @@ if __name__ == "__main__":
                                     print(Fore.YELLOW + "  Waiting 60 seconds before retrying... (Change your VPN IP now to resume instantly!)")
                                     sleep(60)
                                 else:
-                                    print(Fore.RED + f"\nError translating {f}: {e}")
+                                    print(Fore.RED + f"\nError translating {basename(f)}: {e}")
                                     folder_success = False
                                     break
                                 
@@ -312,10 +366,18 @@ if __name__ == "__main__":
                     print(Fore.YELLOW + f"\n  Skipped (All {total_files} images already translated)")
                     stats['skipped'] += 1
                 elif folder_success:
-                    print(Fore.GREEN + f"\nSuccessfully finished processing: {folder_name}")
+                    print(Fore.GREEN + f"\nSuccessfully finished processing: {basename(item_path)}")
                     stats['processed'] += 1
+                    
+                    if item_type == 'archive':
+                        print(Fore.CYAN + f"  Packaging into .cbz...")
+                        temp_zip = join(OUTPUT_DIR, output_folder_name)
+                        shutil.make_archive(temp_zip, 'zip', output_dir)
+                        os.rename(temp_zip + '.zip', final_archive_path)
+                        shutil.rmtree(source_dir, ignore_errors=True)
+                        shutil.rmtree(output_dir, ignore_errors=True)
                 else:
-                    print(Fore.RED + f"\nFailed processing: {folder_name}")
+                    print(Fore.RED + f"\nFailed processing: {basename(item_path)}")
                     stats['failed'] += 1
                     
                 if abort_all:
