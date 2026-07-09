@@ -2,7 +2,7 @@
 An automated Python script that batch-translates raw manga pages from Japanese to English using the MangaTranslate API. 
 
 ## Version
-Current Version: **2.0.9**
+Current Version: **2.1.0**
 
 [![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=download)](https://github.com/jsoul-dev/automation-scripts/releases/latest/download/manga-translator.py)
 
@@ -42,6 +42,7 @@ manga-translator/
 
 ### Smart Archive Support (ZIP/CBZ)
 You can directly drop `.zip` and `.cbz` manga archives into the `input` directory! The script will safely extract them to a temporary workspace, translate the images while preserving any internal nested folders, and seamlessly package them back into a `.cbz` archive in the `output` directory!
+
 5. **Smart Resumption (Save Credits!)**: If the script is interrupted or aborts due to rate limits, it will **NOT** re-translate the entire folder from scratch! When you restart it, it will automatically detect which images already exist in the `output` folder, skip them to save your credits and time, and instantly resume on the exact image it left off on!
 
 ## Proxies & Rate Limits
@@ -50,6 +51,8 @@ The API typically restricts usage to **10 images per IP address**.
 - **Manual VPN Rotation**: If you don't use proxies, the script will display a `Too many requests` warning and prompt you. You can either wait 60 seconds (and change your VPN IP manually during the countdown to resume instantly), or abort the current run.
 
 ## Features
+- **Auto-Delete Raw Files**: Configure `DELETE_INPUT_ON_SUCCESS = True` at the top of the script to automatically delete raw input files after a successful translation to save disk space!
+- **Smart Retries**: Automatically retries failed image translations up to 3 times before giving up to gracefully handle random API hiccups or timeouts.
 - **Archive Support**: Native extraction and repackaging for `.zip` and `.cbz` manga archives, fully preserving internal nested folder structures!
 - **Configurable Models**: Supports various translation models (CTD, CTD2, HTD, etc.) and fonts by changing the variables at the top of the script.
 - **Smart Resumption**: Skips over individual images that have already been translated and saved in the output directory.

@@ -24,11 +24,12 @@ except ImportError:
 if sys.platform == 'win32':
     sys.stdout.reconfigure(encoding='utf-8')
 
-__version__ = "2.0.9"
+__version__ = "2.1.0"
 
 INPUT_DIR = 'input'
 OUTPUT_DIR = 'output'
 TEMP_DIR = '.temp'
+DELETE_INPUT_ON_SUCCESS = False
 src_lang = 'ja'
 out_lang = 'en'
 font = 'auto'
@@ -327,6 +328,7 @@ if __name__ == "__main__":
                         already_done_count += 1
                         continue
                         
+                    retry_count = 0
                     while True:
                         current_proxy = proxy_list[current_proxy_index] if proxy_list else None
                         try:
@@ -355,9 +357,15 @@ if __name__ == "__main__":
                                     print(Fore.YELLOW + "  Waiting 60 seconds before retrying... (Change your VPN IP now to resume instantly!)")
                                     sleep(60)
                                 else:
-                                    print(Fore.RED + f"\nError translating {basename(f)}: {e}")
-                                    folder_success = False
-                                    break
+                                    if retry_count < 3:
+                                        print(Fore.YELLOW + f"\n  [!] Error translating {basename(f)}: {e}")
+                                        print(Fore.YELLOW + f"  Retrying ({retry_count+1}/3) in 5 seconds...")
+                                        sleep(5)
+                                        retry_count += 1
+                                    else:
+                                        print(Fore.RED + f"\n  [!] Failed translating {basename(f)} after 3 retries: {e}")
+                                        folder_success = False
+                                        break
                                 
                     if not folder_success:
                         break
@@ -378,6 +386,13 @@ if __name__ == "__main__":
                         shutil.rmtree(source_dir, ignore_errors=True)
                         
                     shutil.rmtree(output_dir, ignore_errors=True)
+                    
+                    if DELETE_INPUT_ON_SUCCESS:
+                        print(Fore.CYAN + f"  Deleting raw input: {basename(item_path)}...")
+                        if isdir(item_path):
+                            shutil.rmtree(item_path, ignore_errors=True)
+                        else:
+                            os.remove(item_path)
                 else:
                     print(Fore.RED + f"\nFailed processing: {basename(item_path)}")
                     stats['failed'] += 1
