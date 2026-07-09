@@ -252,7 +252,16 @@ if __name__ == "__main__":
                 p = join(INPUT_DIR, f)
                 if isdir(p):
                     items.append((p, 'dir'))
-                elif f.lower().endswith(('.zip', '.cbz')):
+                elif f.lower().endswith('.cbz'):
+                    items.append((p, 'archive'))
+                elif f.lower().endswith('.zip'):
+                    new_p = p[:-4] + '.cbz'
+                    try:
+                        rename(p, new_p)
+                        p = new_p
+                        print(Fore.CYAN + f"Auto-renamed input archive to .cbz: {basename(p)}")
+                    except Exception:
+                        pass
                     items.append((p, 'archive'))
                     
             stats = {'processed': 0, 'skipped': 0, 'failed': 0}
