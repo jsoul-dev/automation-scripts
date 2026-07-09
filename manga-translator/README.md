@@ -2,7 +2,7 @@
 An automated Python script that batch-translates raw manga pages from Japanese to English using the MangaTranslate API. 
 
 ## Version
-Current Version: **2.0.8**
+Current Version: **2.0.9**
 
 [![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=download)](https://github.com/jsoul-dev/automation-scripts/releases/latest/download/manga-translator.py)
 

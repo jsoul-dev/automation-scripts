@@ -24,7 +24,7 @@ except ImportError:
 if sys.platform == 'win32':
     sys.stdout.reconfigure(encoding='utf-8')
 
-__version__ = "2.0.8"
+__version__ = "2.0.9"
 
 INPUT_DIR = 'input'
 OUTPUT_DIR = 'output'
@@ -264,7 +264,7 @@ if __name__ == "__main__":
                 final_archive_path = join(OUTPUT_DIR, f"{output_folder_name}.cbz")
                 
                 # Check skip
-                if item_type == 'archive' and exists(final_archive_path):
+                if exists(final_archive_path):
                     print(Fore.YELLOW + f"\nSkipped (Already translated archive): {basename(item_path)}")
                     stats['skipped'] += 1
                     continue
@@ -369,13 +369,15 @@ if __name__ == "__main__":
                     print(Fore.GREEN + f"\nSuccessfully finished processing: {basename(item_path)}")
                     stats['processed'] += 1
                     
+                    print(Fore.CYAN + f"  Packaging into .cbz...")
+                    temp_zip = join(OUTPUT_DIR, output_folder_name)
+                    shutil.make_archive(temp_zip, 'zip', output_dir)
+                    os.rename(temp_zip + '.zip', final_archive_path)
+                    
                     if item_type == 'archive':
-                        print(Fore.CYAN + f"  Packaging into .cbz...")
-                        temp_zip = join(OUTPUT_DIR, output_folder_name)
-                        shutil.make_archive(temp_zip, 'zip', output_dir)
-                        os.rename(temp_zip + '.zip', final_archive_path)
                         shutil.rmtree(source_dir, ignore_errors=True)
-                        shutil.rmtree(output_dir, ignore_errors=True)
+                        
+                    shutil.rmtree(output_dir, ignore_errors=True)
                 else:
                     print(Fore.RED + f"\nFailed processing: {basename(item_path)}")
                     stats['failed'] += 1
