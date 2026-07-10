@@ -3,12 +3,11 @@
 An automated Python script that monitors a specific Twitch channel and automatically records the stream using `streamlink` and `ffmpeg` whenever the streamer goes live.
 
 ## Version
-Current Version: **1.0.0**
+Current Version: **1.0.1**
 
 [![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=download)](https://github.com/jsoul-dev/automation-scripts/releases/latest/download/twitch-recorder.py)
 
-> [!NOTE]
-> This script is currently pending an update/rewrite. It currently suffers from a bug where it stops recording if the video exceeds 4 hours in length or 9GB in size, causing subsequent footage of long streams to be lost. Additionally, it is a monolithic, single-file script (spaghetti code) that needs to be modularized and split into multiple files for better organization. For future updates, it may be best to avoid passing custom `streamlink` args and just rely on its default behavior.
+
 
 ## Dependencies
 

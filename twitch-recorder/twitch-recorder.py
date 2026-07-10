@@ -6,6 +6,7 @@
 import time
 import subprocess
 import os
+import signal
 import requests
 import datetime
 import sys
@@ -17,7 +18,7 @@ init(autoreset=True)
 
 # === LOAD CONFIGURATION ===
 CONFIG_FILE = "config.ini"
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 
 def load_config():
     """Load configuration from config.ini or create default if missing."""
@@ -39,14 +40,7 @@ def load_config():
         }
         config['StreamlinkArgs'] = {
             'retry_open': '5',
-            'retry_streams': '10',
-            'stream_timeout': '90',
-            'stream_segment_threads': '5',
-            'stream_segment_attempts': '10',
-            'stream_segment_timeout': '20',
-            'hls_playlist_reload_attempts': '10',
-            'hls_segment_queue_threshold': '0',
-            'hls_live_edge': '6'
+            'retry_streams': '10'
         }
         
         with open(CONFIG_FILE, 'w') as f:
@@ -151,6 +145,8 @@ def fetch_stream_info():
     try:
         r.raise_for_status()
     except Exception as e:
+        if r.status_code == 401:
+            return {"error": "auth", "status": r.status_code, "text": r.text}
         return {"error": "http", "status": r.status_code, "text": r.text}
 
     data = r.json().get("data", [])
@@ -173,14 +169,13 @@ def start_recording(stream_obj=None):
     cmd = ["streamlink"] + STREAMLINK_EXTRA_ARGS + [f"twitch.tv/{STREAMER}", QUALITY, "-o", ts_path]
     print_info(f"Starting recording -> {Fore.WHITE}{os.path.basename(ts_path)}")
     try:
-        # CRITICAL: Don't use DEVNULL - it can cause Streamlink to crash silently
-        # Instead, capture output to PIPE so the process stays alive
+        # DEVNULL prevents subprocess pipe deadlock since we don't drain the output
         record_process = subprocess.Popen(
             cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
             stdin=subprocess.DEVNULL,
-            creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
+            creationflags=(subprocess.CREATE_NO_WINDOW | subprocess.CREATE_NEW_PROCESS_GROUP) if os.name == 'nt' else 0
         )
     except FileNotFoundError:
         print_error("streamlink not found. Install streamlink and ensure it's on PATH")
@@ -216,7 +211,10 @@ def stop_recording(finalize=True):
     if record_process.poll() is None:
         print_info("Stopping recording...")
         try:
-            record_process.terminate()
+            if os.name == 'nt':
+                os.kill(record_process.pid, signal.CTRL_BREAK_EVENT)
+            else:
+                record_process.terminate()
             record_process.wait(timeout=10)
         except subprocess.TimeoutExpired:
             try:
@@ -232,7 +230,8 @@ def stop_recording(finalize=True):
     if current_session and finalize:
         ts = current_session.get("ts_path")
         mp4 = current_session.get("mp4_path")
-        expected_duration = int(time.time() - current_session.get("start_time", time.time())) - 600
+        last_live_time = current_session.get("last_live_time", time.time())
+        expected_duration = int(last_live_time - current_session.get("start_time", time.time()))
         
         if ts and os.path.exists(ts):
             try:
@@ -287,12 +286,13 @@ def main():
     try:
         get_token()
     except Exception as e:
-        print_error(f"Failed to get token: {e}")
-        input("Press Enter to continue monitoring...")
+        print_error(f"Failed to get token: {e}. Will retry in loop.")
+        time.sleep(5)
 
     backoff = 1
     disconnect_since = None
     monitoring_printed = False
+    last_disconnect_print = 0
 
     while True:
         try:
@@ -327,6 +327,12 @@ def main():
                     print_warn(f"Rate limited. Waiting {wait}s...")
                     time.sleep(wait)
                     continue
+                elif err == "auth":
+                    print_warn("Token unauthorized (401). Forcing token refresh...")
+                    token_expires = 0
+                    time.sleep(min(backoff, 60))
+                    backoff = min(backoff * 2, 300)
+                    continue
                 elif err == "network":
                     print_warn(f"Network error. Retrying in {min(backoff, 60)}s...")
                     time.sleep(min(backoff, 60))
@@ -350,11 +356,13 @@ def main():
                 if is_recording:
                     if disconnect_since is None:
                         disconnect_since = time.time()
+                        last_disconnect_print = time.time()
                         print_check(f"{Fore.YELLOW}{STREAMER}{Fore.BLUE} disconnected. Grace period: {Fore.WHITE}{GRACE_PERIOD}s")
                     else:
                         elapsed = int(time.time() - disconnect_since)
-                        if elapsed % 30 == 0:
+                        if time.time() - last_disconnect_print >= 30:
                             print_check(f"Still disconnected ({Fore.WHITE}{elapsed}s{Fore.BLUE} / {Fore.WHITE}{GRACE_PERIOD}s{Fore.BLUE})")
+                            last_disconnect_print = time.time()
                     
                     if (time.time() - disconnect_since) > GRACE_PERIOD:
                         print_info(f"Stream ended. Grace period exceeded")
@@ -382,12 +390,33 @@ def main():
                     is_recording = True
                     disconnect_since = None
                     monitoring_printed = False
+                    current_session["last_live_time"] = time.time()
+                    current_session["last_file_size"] = 0
+                    current_session["last_size_time"] = time.time()
                 except Exception as e:
                     print_error(f"Failed to start recording: {e}")
-                    input("Press Enter to continue monitoring...")
+                    time.sleep(5)
                     is_recording = False
             else:
+                current_session["last_live_time"] = time.time()
                 prev_started = current_session.get("started_at") if current_session else None
+                
+                # Check if recording file is still growing
+                ts_path = current_session.get("ts_path")
+                if ts_path and os.path.exists(ts_path):
+                    curr_size = os.path.getsize(ts_path)
+                    last_size = current_session.get("last_file_size", 0)
+                    last_size_time = current_session.get("last_size_time", time.time())
+                    
+                    if curr_size > last_size:
+                        current_session["last_file_size"] = curr_size
+                        current_session["last_size_time"] = time.time()
+                    elif time.time() - last_size_time > 120:
+                        print_error("Recording file size hasn't grown in 2 minutes. Restarting streamlink...")
+                        stop_recording(finalize=True)
+                        is_recording = False
+                        disconnect_since = None
+                        continue
                 
                 if prev_started and started_at != prev_started:
                     print_info(f"New stream detected. Finalizing previous recording...")
@@ -402,7 +431,7 @@ def main():
                         monitoring_printed = False
                     except Exception as e:
                         print_error(f"Failed to start new recording: {e}")
-                        input("Press Enter to continue monitoring...")
+                        time.sleep(5)
                         is_recording = False
                 else:
                     if disconnect_since:
@@ -413,7 +442,9 @@ def main():
                     # Print heartbeat at configured interval (default: every 60 minutes)
                     if current_session:
                         elapsed_recording = int(time.time() - current_session.get("start_time", time.time()))
-                        if elapsed_recording > 0 and elapsed_recording % HEARTBEAT_INTERVAL == 0:
+                        last_hb = current_session.get("last_heartbeat_time", current_session.get("start_time", time.time()))
+                        if elapsed_recording > 0 and (time.time() - last_hb >= HEARTBEAT_INTERVAL):
+                            current_session["last_heartbeat_time"] = time.time()
                             duration_str = format_duration(elapsed_recording)
                             print_check(f"Recording {Fore.YELLOW}{STREAMER}{Fore.BLUE}... ({Fore.WHITE}{duration_str}{Fore.BLUE})")
 
@@ -426,7 +457,8 @@ def main():
                 stop_recording(finalize=True)
                 is_recording = False
             try:
-                input(f"\n{Fore.CYAN}Press Enter to resume monitoring (or Ctrl+C again to exit)...{Style.RESET_ALL}")
+                print(f"\n{Fore.CYAN}Monitoring suspended. Press Enter to resume (or Ctrl+C again to exit)...{Style.RESET_ALL}")
+                input()
                 monitoring_printed = False
             except KeyboardInterrupt:
                 print()  # New line
@@ -437,13 +469,8 @@ def main():
             import traceback
             print_error("Unexpected error:")
             print(f"{Fore.RED}{traceback.format_exc()}{Style.RESET_ALL}")
-            try:
-                input(f"\n{Fore.CYAN}Press Enter to continue monitoring...{Style.RESET_ALL}")
-            except KeyboardInterrupt:
-                print_warn("Force exiting...")
-                if is_recording:
-                    stop_recording(finalize=True)
-                sys.exit(1)
+            print_warn("Retrying in 10 seconds...")
+            time.sleep(10)
 
 if __name__ == "__main__":
     main()
