@@ -24,6 +24,15 @@ When run, this script applies the following policies to Brave:
 1. Run `brave-debloater.bat`. (If prompted by User Account Control, click Yes to allow Administrator access).
 2. Open Brave and go to `brave://policy` to verify that the policies have been applied.
 
+## Privacy Tip: Installer Referral Tracking
+
+> [!TIP]
+> **Rename the Brave installer before running it!**
+> 
+> When you download Brave, the filename often contains an alphanumeric tracking code (e.g., `BraveBrowserSetup-BRV010.exe`). This is a **referral code** used by Brave for telemetry to track the source of your download (e.g., from a specific ad campaign or affiliate link), which is extracted by the browser on its first launch.
+> 
+> To completely opt-out of this initial telemetry ping, simply rename the installer file to something generic (like `BraveSetup.exe`) *before* you run it.
+
 ## Notes
 
 - Because these are applied as administrative policies, some settings in Brave's UI will show as "Managed by your organization" and cannot be toggled manually by a standard user.
