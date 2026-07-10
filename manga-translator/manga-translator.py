@@ -366,13 +366,11 @@ if __name__ == "__main__":
                             else:
                                 if "Too many requests" in error_msg or "rate limit" in error_msg.lower():
                                     print(Fore.RED + f"\n  [!] Rate limit hit: {error_msg}")
-                                    ans = input(Fore.YELLOW + "  Wait 60s to retry, or abort and show summary? (w/a) [default: w]: ").strip().lower()
+                                    ans = input(Fore.YELLOW + "  Press ENTER after changing your VPN IP to retry instantly, or type 'a' to abort: ").strip().lower()
                                     if ans == 'a':
                                         folder_success = False
                                         abort_all = True
                                         break
-                                    print(Fore.YELLOW + "  Waiting 60 seconds before retrying... (Change your VPN IP now to resume instantly!)")
-                                    sleep(60)
                                 else:
                                     if retry_count < 3:
                                         print(Fore.YELLOW + f"\n  [!] Error translating {basename(f)}: {e}")

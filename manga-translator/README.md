@@ -51,7 +51,7 @@ The API typically restricts usage to **10 images per IP address**.
   - **Where to get free proxies:**
     - [ProxyScrape Free Proxy List](https://proxyscrape.com/free-proxy-list)
     - [Geonode Free Proxy List](https://geonode.com/free-proxy-list)
-- **Manual VPN Rotation**: If you don't use proxies, the script will display a `Too many requests` warning and prompt you. You can either wait 60 seconds (and change your VPN IP manually during the countdown to resume instantly), or abort the current run.
+- **Manual VPN Rotation**: If you don't use proxies, the script will display a `Too many requests` warning and pause. You can simply change your VPN IP manually and press Enter to instantly resume translation!
 
 ## Features
 - **Auto-Delete Raw Files**: Configure `DELETE_INPUT_ON_SUCCESS = True` at the top of the script to automatically delete raw input files after a successful translation to save disk space!
