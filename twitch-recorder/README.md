@@ -3,7 +3,7 @@
 An automated Python script that monitors a specific Twitch channel and automatically records the stream using `streamlink` and `ffmpeg` whenever the streamer goes live.
 
 ## Version
-Current Version: **1.0.1**
+Current Version: **1.0.2**
 
 [![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=download)](https://github.com/jsoul-dev/automation-scripts/releases/latest/download/twitch-recorder.py)
 

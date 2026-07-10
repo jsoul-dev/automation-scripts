@@ -18,7 +18,7 @@ init(autoreset=True)
 
 # === LOAD CONFIGURATION ===
 CONFIG_FILE = "config.ini"
-VERSION = "1.0.1"
+VERSION = "1.0.2"
 
 def load_config():
     """Load configuration from config.ini or create default if missing."""
@@ -273,8 +273,27 @@ def stop_recording(finalize=True):
     
     current_session = None
 
+def auto_update_streamlink():
+    if "--no-update" in sys.argv:
+        sys.argv.remove("--no-update")
+        return
+
+    print_info("Checking for streamlink updates...")
+    try:
+        subprocess.run([sys.executable, "-m", "pip", "install", "-U", "streamlink", "--quiet"], check=True)
+        print_success("Streamlink is up to date.")
+    except Exception as e:
+        print_warn(f"Failed to update streamlink: {e}")
+
+    print_info("Relaunching script with updated environment...")
+    # Relaunch script as a child to ensure Python loads the newly installed package version
+    args = [sys.executable] + sys.argv + ["--no-update"]
+    sys.exit(subprocess.call(args))
+
 # ==== main loop ====
 def main():
+    auto_update_streamlink()
+    
     global access_token, token_expires, is_recording, record_process, current_session
 
     print(f"\n{Fore.MAGENTA}{'='*70}")
