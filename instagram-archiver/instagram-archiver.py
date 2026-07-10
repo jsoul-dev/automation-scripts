@@ -7,6 +7,7 @@ Uses session cookies to avoid 401 errors
 
 import instaloader
 import sys
+import subprocess
 import os
 import time
 import json
@@ -15,7 +16,7 @@ import io
 import contextlib
 from colorama import init, Fore, Back, Style
 
-VERSION = "1.0.2"
+VERSION = "1.0.3"
 
 # Initialize colorama
 init(autoreset=True)
@@ -543,8 +544,25 @@ def load_config():
         return json.load(f)
 
 
+def auto_update_instaloader():
+    if "--no-update" in sys.argv:
+        sys.argv.remove("--no-update")
+        return
+
+    print_info("Checking for instaloader updates...")
+    try:
+        subprocess.run([sys.executable, "-m", "pip", "install", "-U", "instaloader", "--quiet"], check=True)
+        print_success("Instaloader is up to date.")
+    except Exception as e:
+        print_warning(f"Failed to update instaloader: {e}")
+
+    print_info("Relaunching script to load updated module...")
+    args = [sys.executable] + sys.argv + ["--no-update"]
+    sys.exit(subprocess.call(args))
+
 def main():
     """Main function with config file support"""
+    auto_update_instaloader()
     
     print()
     print(f"{Fore.CYAN}{Style.BRIGHT}+{'-' * 68}+")
