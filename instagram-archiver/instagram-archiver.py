@@ -16,7 +16,7 @@ import io
 import contextlib
 from colorama import init, Fore, Back, Style
 
-VERSION = "1.0.3"
+VERSION = "1.0.4"
 
 # Initialize colorama
 init(autoreset=True)
