@@ -398,6 +398,13 @@ def main():
                     time.sleep(5)
                     is_recording = False
             else:
+                if record_process and record_process.poll() is not None:
+                    print_error("Streamlink process terminated unexpectedly. Restarting...")
+                    stop_recording(finalize=True)
+                    is_recording = False
+                    disconnect_since = None
+                    continue
+
                 current_session["last_live_time"] = time.time()
                 prev_started = current_session.get("started_at") if current_session else None
                 
