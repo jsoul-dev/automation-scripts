@@ -52,21 +52,21 @@ def load_config():
 
 config = load_config()
 
-CLIENT_ID = config['Twitch']['client_id']
-CLIENT_SECRET = config['Twitch']['client_secret']
-STREAMER = config['Twitch']['streamer']
-OUTPUT_DIR = config['Recording']['output_dir']
-QUALITY = config['Recording']['quality']
-CHECK_INTERVAL = config.getint('Recording', 'check_interval')
-GRACE_PERIOD = config.getint('Recording', 'grace_period')
-HEARTBEAT_INTERVAL = config.getint('Recording', 'heartbeat_interval')
+CLIENT_ID = config.get('Twitch', 'client_id', fallback='')
+CLIENT_SECRET = config.get('Twitch', 'client_secret', fallback='')
+STREAMER = config.get('Twitch', 'streamer', fallback='')
+OUTPUT_DIR = config.get('Recording', 'output_dir', fallback=r'E:\.Twitch Automated Recordings')
+QUALITY = config.get('Recording', 'quality', fallback='best')
+CHECK_INTERVAL = config.getint('Recording', 'check_interval', fallback=30)
+GRACE_PERIOD = config.getint('Recording', 'grace_period', fallback=600)
+HEARTBEAT_INTERVAL = config.getint('Recording', 'heartbeat_interval', fallback=3600)
 
 # Build streamlink args from config
 STREAMLINK_EXTRA_ARGS = []
-args = config['StreamlinkArgs']
-for key, value in args.items():
-    arg_name = '--' + key.replace('_', '-')
-    STREAMLINK_EXTRA_ARGS.extend([arg_name, value])
+if 'StreamlinkArgs' in config:
+    for key, value in config['StreamlinkArgs'].items():
+        arg_name = '--' + key.replace('_', '-')
+        STREAMLINK_EXTRA_ARGS.extend([arg_name, value])
 
 # === GLOBALS ===
 access_token = None
@@ -223,7 +223,11 @@ def stop_recording(finalize=True):
             except Exception:
                 pass
         except Exception:
-            pass
+            try:
+                record_process.kill()
+                record_process.wait(timeout=2)
+            except Exception:
+                pass
 
     record_process = None
 
@@ -321,9 +325,10 @@ def main():
                             if reset_int > time.time():
                                 wait = max(1, reset_int - int(time.time()))
                             else:
-                                wait = reset_int
+                                wait = 1
                     except Exception:
                         pass
+                    wait = min(wait, 300) # Cap at 5 minutes to prevent massive sleep bugs
                     print_warn(f"Rate limited. Waiting {wait}s...")
                     time.sleep(wait)
                     continue
