@@ -3,7 +3,7 @@
 An automated Python script that leverages `instaloader` to download and archive complete Instagram profiles, including posts, stories, and highlights.
 
 ## Version
-Current Version: **1.0.3**
+Current Version: **1.1.0**
 
 [![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=download)](https://github.com/jsoul-dev/automation-scripts/releases/latest/download/instagram-archiver.py)
 
@@ -21,7 +21,7 @@ Current Version: **1.0.3**
 Before running the script, you must install the required Python packages:
 
 ```bash
-pip install instaloader colorama
+pip install instaloader colorama browser-cookie3
 ```
 
 ## Setup & Usage

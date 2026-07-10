@@ -16,7 +16,7 @@ import io
 import contextlib
 from colorama import init, Fore, Back, Style
 
-VERSION = "1.0.3"
+VERSION = "1.1.0"
 
 # Initialize colorama
 init(autoreset=True)
@@ -501,6 +501,47 @@ def archive_profile(target_username, session_data=None, output_dir=None, profile
         return False
 
 
+def extract_browser_cookies():
+    """Attempt to extract Instagram cookies from local web browsers."""
+    try:
+        import browser_cookie3
+    except ImportError:
+        return None, "browser-cookie3 not installed"
+        
+    target_cookies = ["csrftoken", "sessionid", "ds_user_id", "mid", "ig_did"]
+    
+    print_info("Scanning installed web browsers for Instagram login...")
+    
+    browsers = [
+        ('Chrome', browser_cookie3.chrome),
+        ('Edge', browser_cookie3.edge),
+        ('Firefox', browser_cookie3.firefox),
+        ('Brave', browser_cookie3.brave),
+        ('Opera', browser_cookie3.opera),
+        ('Chromium', browser_cookie3.chromium)
+    ]
+    
+    for browser_name, browser_func in browsers:
+        try:
+            cj = browser_func(domain_name='instagram.com')
+            browser_extracted = {}
+            for cookie in cj:
+                if cookie.name in target_cookies:
+                    browser_extracted[cookie.name] = cookie.value
+            
+            if 'sessionid' in browser_extracted and browser_extracted['sessionid']:
+                print_success(f"Found active Instagram session in {browser_name}!")
+                # Ensure all 5 keys exist
+                for k in target_cookies:
+                    if k not in browser_extracted:
+                        browser_extracted[k] = ""
+                return browser_extracted, None
+                
+        except Exception:
+            continue
+            
+    return None, "No active Instagram session found in any supported browser."
+
 def load_config():
     """Load configuration from config.json file"""
     config_file = Path("config.json")
@@ -541,7 +582,33 @@ def load_config():
         print()
     
     with open(config_file, 'r', encoding='utf-8') as f:
-        return json.load(f)
+        config = json.load(f)
+        
+    # Check if cookies need auto-filling
+    cookies = config.get("my_cookies", {})
+    if not cookies or cookies.get("sessionid") in ["your_sessionid", "", None]:
+        print_info("No active session cookies found in config.")
+        auto_cookies, error = extract_browser_cookies()
+        if auto_cookies:
+            config["my_cookies"] = auto_cookies
+            if config.get("my_username") in ["your_username", "", None]:
+                print_warning("Auto-detected cookies, but need your username.")
+                username = input(f"{Fore.CYAN}[?] Enter your Instagram username: {Style.RESET_ALL}").strip()
+                if username:
+                    config["my_username"] = username
+
+            # Save the updated config back to disk
+            with open(config_file, 'w', encoding='utf-8') as f:
+                json.dump(config, f, indent=4)
+            print_success("config.json has been automatically updated with your cookies!")
+        elif error == "browser-cookie3 not installed":
+            print_warning("You can automate cookie extraction by installing a helper package:")
+            print_warning("Run: pip install browser-cookie3")
+        else:
+            print_warning(error)
+            print_warning("Please log into Instagram on Chrome/Edge/Firefox and run again, or manually fill config.json.")
+            
+    return config
 
 
 def auto_update_instaloader():
