@@ -2,7 +2,7 @@
 An automated Python script that batch-translates raw manga pages from Japanese to English using the MangaTranslate API. 
 
 ## Version
-Current Version: **2.1.0**
+Current Version: **2.1.1**
 
 [![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=download)](https://github.com/jsoul-dev/automation-scripts/releases/latest/download/manga-translator.py)
 
@@ -48,6 +48,9 @@ You can directly drop `.zip` and `.cbz` manga archives into the `input` director
 ## Proxies & Rate Limits
 The API typically restricts usage to **10 images per IP address**. 
 - **Automated Proxy Rotation**: To bypass this limit entirely, create a `proxies` folder next to the script and drop in your proxy lists (Standard IP:PORT or Geonode CSVs). The script will automatically load them and instantly rotate to a new IP whenever the rate limit is hit, allowing you to translate massive batches of manga hands-free!
+  - **Where to get free proxies:**
+    - [ProxyScrape Free Proxy List](https://proxyscrape.com/free-proxy-list)
+    - [Geonode Free Proxy List](https://geonode.com/free-proxy-list)
 - **Manual VPN Rotation**: If you don't use proxies, the script will display a `Too many requests` warning and prompt you. You can either wait 60 seconds (and change your VPN IP manually during the countdown to resume instantly), or abort the current run.
 
 ## Features

@@ -25,7 +25,7 @@ except ImportError:
 if sys.platform == 'win32':
     sys.stdout.reconfigure(encoding='utf-8')
 
-__version__ = "2.1.0"
+__version__ = "2.1.1"
 
 INPUT_DIR = 'input'
 OUTPUT_DIR = 'output'
@@ -259,7 +259,7 @@ if __name__ == "__main__":
                     try:
                         rename(p, new_p)
                         p = new_p
-                        print(Fore.CYAN + f"Auto-renamed input archive to .cbz: {basename(p)}")
+                        print(Fore.CYAN + f"\nAuto-renamed input archive to .cbz: {basename(p)}")
                     except Exception:
                         pass
                     items.append((p, 'archive'))
