@@ -15,7 +15,7 @@ import io
 import contextlib
 from colorama import init, Fore, Back, Style
 
-VERSION = "1.0.0"
+VERSION = "1.0.2"
 
 # Initialize colorama
 init(autoreset=True)
@@ -95,6 +95,7 @@ def archive_profile(target_username, session_data=None, output_dir=None, profile
         fatal_status_codes=[],
         sleep=True,
         quiet=True,
+        user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
     )
     
     # Create organized folder structure
@@ -139,7 +140,14 @@ def archive_profile(target_username, session_data=None, output_dir=None, profile
             L.context.username = username
             
             print_progress("Testing authentication...")
-            test_result = L.test_login()
+            f = io.StringIO()
+            with contextlib.redirect_stdout(f), contextlib.redirect_stderr(f):
+                try:
+                    test_result = L.test_login()
+                except Exception as e:
+                    test_result = None
+                    captured = f.getvalue()
+                    print_error(f"Login test raised: {str(e)[:100]}")
             
             if test_result:
                 print_success(f"Authentication successful: @{test_result}")
@@ -179,8 +187,17 @@ def archive_profile(target_username, session_data=None, output_dir=None, profile
         # Load the profile
         print_header("PROFILE INFORMATION")
         print()
+        time.sleep(4)
         print_progress(f"Loading profile: @{target_username}")
-        profile = instaloader.Profile.from_username(L.context, target_username)
+        f = io.StringIO()
+        with contextlib.redirect_stdout(f), contextlib.redirect_stderr(f):
+            profile = instaloader.Profile.from_username(L.context, target_username)
+            # Access properties to trigger any lazy-loaded GraphQL requests while suppressed
+            _ = profile.followers
+            _ = profile.followees
+            _ = profile.mediacount
+            _ = profile.biography
+            _ = profile.is_private
         
         print()
         print_stat("Username", f"@{profile.username}", 11)
