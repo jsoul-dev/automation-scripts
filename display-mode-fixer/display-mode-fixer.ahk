@@ -5,11 +5,11 @@
 #Requires AutoHotkey v2.0
 #SingleInstance Force
 Persistent
-global Version := "1.0.0"
+global Version := "1.0.1"
 
 global Monitoring := false
 global AutoFix := true  ; Auto-switch to Second screen only
-global startupPath := A_Startup . "\DisplayModeMonitor.lnk"
+global startupPath := A_Startup . "\Display Mode Fixer.lnk"
 
 ; Setup tray icon
 TraySetIcon("shell32.dll", 35)  ; Monitor icon

@@ -3,7 +3,7 @@
 An AutoHotkey v2 script that monitors your Windows display projection mode and automatically switches it to "Second screen only" to prevent performance issues.
 
 ## Version
-Current Version: **1.0.0**
+Current Version: **1.0.1**
 
 [![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=download)](https://github.com/jsoul-dev/automation-scripts/releases/latest/download/display-mode-fixer.ahk)
 
