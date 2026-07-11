@@ -12,7 +12,7 @@ if (!A_IsAdmin) {
     }
     ExitApp()
 }
-global Version := "1.1.1"
+global Version := "1.1.2"
 
 ; ===== CONFIGURATION =====
 enableMouseBlock := true       ; true = disable mouse when monitor turns off
@@ -21,7 +21,7 @@ enableMute := false            ; true = mute system when monitor turns off
 enableAutoOffMonitor := false  ; true = automatically turn off monitor (false = lock only)
 enableAutoLockWindows := false ; true = automatically lock windows (Win+L)
 enableNotifications := false   ; show tray notifications
-debugMode := false             ; logs events to file at %A_ScriptDir%\MonitorLock.log
+debugMode := false             ; logs events to file at %A_ScriptDir%\idle-locker.log
 idleTimeoutMinutes := 0        ; Will be auto-detected from Windows settings (0 = auto-detect)
 recheckTimeoutMinutes := 10    ; Re-check Windows timeout every X minutes
 idleDetectionEnabled := true   ; Master toggle for idle detection
@@ -33,7 +33,7 @@ autoRelockMinutes := 3         ; Minutes of idle time before turning monitor bac
 global mouseBlocked := false
 global keyboardBlocked := false
 global monitorOff := false
-global logFile := A_ScriptDir "\MonitorLock.log"
+global logFile := A_ScriptDir "\idle-locker.log"
 global startupPath := A_AppData "\Microsoft\Windows\Start Menu\Programs\Startup\Idle Locker.lnk"
 global idleTimeoutMs := 0  ; Will be calculated from idleTimeoutMinutes
 global autoDetectTimeout := (idleTimeoutMinutes = 0)  ; Remember if we're auto-detecting
@@ -202,7 +202,7 @@ GetWindowsScreenTimeout() {
 
 RunWaitOne(command) {
     ; Use Run with hidden window and capture output to temp file
-    tempFile := A_Temp "\monitorlock_" A_TickCount ".txt"
+    tempFile := A_Temp "\idlelocker_" A_TickCount ".txt"
 
     ; Run hidden and wait for completion
     RunWait(A_ComSpec " /C " command " > `"" tempFile "`"", , "Hide")
