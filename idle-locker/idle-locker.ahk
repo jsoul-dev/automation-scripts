@@ -12,7 +12,7 @@ if (!A_IsAdmin) {
     }
     ExitApp()
 }
-global Version := "1.1.2"
+global Version := "1.1.3"
 
 ; ===== CONFIGURATION =====
 enableMouseBlock := true       ; true = disable mouse when monitor turns off
@@ -202,7 +202,7 @@ GetWindowsScreenTimeout() {
 
 RunWaitOne(command) {
     ; Use Run with hidden window and capture output to temp file
-    tempFile := A_Temp "\idlelocker_" A_TickCount ".txt"
+    tempFile := A_Temp "\idle-locker_" A_TickCount ".txt"
 
     ; Run hidden and wait for completion
     RunWait(A_ComSpec " /C " command " > `"" tempFile "`"", , "Hide")
