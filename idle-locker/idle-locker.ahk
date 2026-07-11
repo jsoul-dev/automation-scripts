@@ -12,7 +12,7 @@ if (!A_IsAdmin) {
     }
     ExitApp()
 }
-global Version := "1.1.0"
+global Version := "1.1.1"
 
 ; ===== CONFIGURATION =====
 enableMouseBlock := true       ; true = disable mouse when monitor turns off
@@ -34,7 +34,7 @@ global mouseBlocked := false
 global keyboardBlocked := false
 global monitorOff := false
 global logFile := A_ScriptDir "\MonitorLock.log"
-global startupPath := A_AppData "\Microsoft\Windows\Start Menu\Programs\Startup\MonitorLock Pro.lnk"
+global startupPath := A_AppData "\Microsoft\Windows\Start Menu\Programs\Startup\Idle Locker.lnk"
 global idleTimeoutMs := 0  ; Will be calculated from idleTimeoutMinutes
 global autoDetectTimeout := (idleTimeoutMinutes = 0)  ; Remember if we're auto-detecting
 global customIdleMinutes := 10 ; For custom input fallback
@@ -84,7 +84,7 @@ A_TrayMenu.Add()
 A_TrayMenu.Add("Exit", (*) => CleanupAndExit())
 
 UpdateTrayMenu()
-ShowNotification("MonitorLock Pro Started", "Detecting Windows idle timeout...")
+ShowNotification("Idle Locker Started", "Detecting Windows idle timeout...")
 
 ; ===== INITIALIZATION =====
 ; Detect Windows screen timeout setting

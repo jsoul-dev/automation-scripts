@@ -3,7 +3,7 @@
 A highly configurable AutoHotkey v2 script that monitors your system for inactivity, automatically locks your Windows session, mutes system volume, and disables mouse/keyboard inputs to prevent accidental wake-ups (like cats walking on keyboards) when your monitor is turned off.
 
 ## Version
-Current Version: **1.1.0**
+Current Version: **1.1.1**
 
 [![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=download)](https://github.com/jsoul-dev/automation-scripts/releases/latest/download/idle-locker.ahk)
 
