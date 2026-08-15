@@ -3,7 +3,7 @@
 This directory contains an interactive, automated batch script to download and install Office 365 ProPlus using the official Microsoft Office Deployment Tool (ODT).
 
 ## Version
-Current Version: **1.3.0**
+Current Version: **1.3.1**
 
 [![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=download)](https://github.com/jsoul-dev/automation-scripts/releases/latest/download/office-installer.bat)
 

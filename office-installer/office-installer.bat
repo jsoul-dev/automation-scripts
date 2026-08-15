@@ -2,7 +2,7 @@
 
 :: =====================================================
 ::  Office 365 ProPlus Installer
-::  Version 1.2.0
+::  Version 1.3.1
 :: =====================================================
 
 :: Self-elevate to administrator
@@ -15,7 +15,7 @@ if %errorlevel% neq 0 (
 
 :: ---- Configuration ----
 
-set "VERSION=1.3.0"
+set "VERSION=1.3.1"
 
 :: Set ANSI escape character
 for /f %%a in ('echo prompt $E ^| cmd') do set "ESC=%%a"
@@ -192,7 +192,7 @@ if not exist "C:\Office" mkdir "C:\Office"
 echo [2/4] Creating Configuration.xml...
 call :WriteXml "C:\Office\Configuration.xml"
 
-echo [3/4] Downloading Office Deployment Tool (setup.exe)...
+echo [3/4] Downloading Office Deployment Tool...
 powershell -Command "Invoke-WebRequest -Uri 'https://officecdn.microsoft.com/pr/wsus/setup.exe' -OutFile 'C:\Office\setup.exe'"
 
 if not exist "C:\Office\setup.exe" (
@@ -215,7 +215,6 @@ if %errorlevel% neq 0 (
     pause
 )
 
-echo.
 echo Cleaning up installation files...
 rmdir /s /q "C:\Office" 2>nul
 
