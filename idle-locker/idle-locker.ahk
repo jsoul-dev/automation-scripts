@@ -12,7 +12,7 @@ if (!A_IsAdmin) {
     }
     ExitApp()
 }
-global Version := "1.1.5"
+global Version := "1.1.6"
 
 ; ===== CONFIGURATION =====
 enableMouseBlock := true       ; true = disable mouse when monitor turns off
@@ -512,7 +512,7 @@ ForceMonitorOff() {
 
 ; ===== BLOCKING =====
 BlockMouse(block := true) {
-    mouseKeys := ["LButton", "RButton", "WheelUp", "WheelDown", "WheelLeft", "WheelRight", "XButton1", "XButton2"]
+    mouseKeys := ["LButton", "RButton", "WheelUp", "WheelDown", "WheelLeft", "WheelRight"]
     for hk in mouseKeys {
         try {
             if (block)
