@@ -25,7 +25,7 @@
 ; ============================================================================
 
 APP_NAME    := "Mouse Mode"
-APP_VERSION := "1.1.0"
+APP_VERSION := "1.1.1"
 
 ; --- Modes ---------------------------------------------------------------
 ; MODE_ORDER controls both the tray menu's display order and the order
@@ -129,8 +129,8 @@ TrayIconMessage(wParam, lParam, msg, hwnd) {
 ; zero-synthetic-event passthrough Browser Mode needs, with no extra code.
 ; (Keep this literal "Media" in sync with the MODE_MEDIA constant above.)
 #HotIf CurrentMode = "Media"
-XButton1::Send("{Left}")
-XButton2::Send("{Right}")
+XButton1::Left
+XButton2::Right
 #HotIf
 
 

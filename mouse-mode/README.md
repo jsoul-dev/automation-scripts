@@ -2,7 +2,7 @@
 A lightweight system tray utility written in AutoHotkey (v2) that allows you to instantly switch the behavior of your mouse's side buttons (XButton1 / XButton2). 
 
 ## Version
-Current Version: **1.1.0**
+Current Version: **1.1.1**
 
 [![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=download)](https://github.com/jsoul-dev/automation-scripts/releases/latest/download/mouse-mode.ahk)
 
