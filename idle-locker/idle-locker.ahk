@@ -12,7 +12,7 @@ if (!A_IsAdmin) {
     }
     ExitApp()
 }
-global Version := "1.1.3"
+global Version := "1.1.5"
 
 ; ===== CONFIGURATION =====
 enableMouseBlock := true       ; true = disable mouse when monitor turns off
@@ -41,13 +41,19 @@ global customIdleMinutes := 10 ; For custom input fallback
 global mButtonHoldStart := 0  ; Track when middle button was pressed
 global mButtonHoldRequired := 2000  ; 2 seconds in milliseconds
 global monitorWokenTime := 0  ; Track when monitor was accidentally woken up
+global scriptEnabled := true  ; Master switch for the whole script
+global originalMuteState := -1 ; Track mute state before locking
 
 global TimerMenu := Menu()
 global currentTimerMenuName := "Idle Timer: Auto"
 
 ; ===== TRAY SETUP =====
 TraySetIcon("shell32.dll", 48)  ; Padlock icon
+A_IconTip := "Idle Locker - Enabled`nDouble-click to disable"
 A_TrayMenu.Delete()
+
+A_TrayMenu.Add("Toggle Enable/Disable", ToggleScriptState)
+A_TrayMenu.Default := "Toggle Enable/Disable"
 
 A_TrayMenu.Add("Status: Ready", (*) => "")
 A_TrayMenu.Disable("Status: Ready")
@@ -93,6 +99,7 @@ UpdateIdleTimeout()
 ; Enable toggle hotkeys from the start
 Hotkey("^!u", ToggleLockHandler, "On")
 Hotkey("^!t", ToggleAlwaysOnTop, "On")
+Hotkey("^!d", ToggleScriptState, "On")
 ; Create blocking MButton hotkeys (initially off, but with correct handlers)
 Hotkey("MButton", MButtonDownHandler, "Off")
 Hotkey("MButton Up", MButtonUpHandler, "Off")
@@ -217,7 +224,10 @@ RunWaitOne(command) {
 }
 
 CheckIdleTime() {
-    global idleTimeoutMs, monitorOff, idleDetectionEnabled, enableAutoOffMonitor, monitorWokenTime, enableAutoRelock, autoRelockMinutes
+    global idleTimeoutMs, monitorOff, idleDetectionEnabled, enableAutoOffMonitor, monitorWokenTime, enableAutoRelock, autoRelockMinutes, scriptEnabled
+
+    if (!scriptEnabled)
+        return
 
     ; Skip if idle detection is disabled
     if (!idleDetectionEnabled)
@@ -297,8 +307,14 @@ MonitorTurnedOff() {
         keyboardBlocked := true
     }
     
-    if (enableMute)
-        SoundSetMute(true)
+    if (enableMute) {
+        try {
+            originalMuteState := SoundGetMute()
+            SoundSetMute(true)
+        } catch {
+            originalMuteState := -1
+        }
+    }
 
     if (enableAutoLockWindows) {
         if (enableMute)
@@ -336,7 +352,10 @@ MonitorTurnedOn() {
 
 ; ===== MIDDLE BUTTON HANDLERS =====
 MButtonDownHandler(*) {
-    global mButtonHoldStart, mButtonHoldRequired, mouseBlocked
+    global mButtonHoldStart, mButtonHoldRequired, mouseBlocked, scriptEnabled
+
+    if (!scriptEnabled)
+        return
 
     mButtonHoldStart := A_TickCount
     DebugLog("MButton pressed, starting hold timer")
@@ -369,6 +388,9 @@ CheckMButtonHold() {
 
 ; ===== TOGGLE LOCK FUNCTION =====
 ToggleLockHandler(*) {
+    global scriptEnabled
+    if (!scriptEnabled)
+        return
     ToggleLock()
 }
 
@@ -404,8 +426,14 @@ LockSystem() {
         keyboardBlocked := true
     }
     
-    if (enableMute)
-        SoundSetMute(true)
+    if (enableMute) {
+        try {
+            originalMuteState := SoundGetMute()
+            SoundSetMute(true)
+        } catch {
+            originalMuteState := -1
+        }
+    }
         
     if (enableAutoLockWindows) {
         if (enableMute)
@@ -418,6 +446,8 @@ LockSystem() {
 
     try A_TrayMenu.Rename("Status: Ready", "Status: Manually Locked")
     try A_TrayMenu.Rename("Status: Disabled", "Status: Manually Locked")
+    try A_TrayMenu.Rename("Status: Script Disabled", "Status: Manually Locked")
+    try A_TrayMenu.Rename("Status: Idle Detection Paused", "Status: Manually Locked")
 
     if (enableAutoOffMonitor) {
         ShowNotification("Manual Lock", "Turning off monitor...")
@@ -431,7 +461,7 @@ LockSystem() {
 }
 
 UnlockSystem() {
-    global mouseBlocked, keyboardBlocked, monitorOff, mButtonHoldStart, monitorWokenTime
+    global mouseBlocked, keyboardBlocked, monitorOff, mButtonHoldStart, monitorWokenTime, enableMute, originalMuteState, scriptEnabled, idleDetectionEnabled
 
     ; Reset middle button timer
     mButtonHoldStart := 0
@@ -447,14 +477,25 @@ UnlockSystem() {
     mouseBlocked := false
     BlockKeyboard(false)
     keyboardBlocked := false
-    SoundSetMute(false)
+    
+    if (enableMute && originalMuteState != -1) {
+        try SoundSetMute(originalMuteState)
+        originalMuteState := -1
+    }
+    
     monitorOff := false
     monitorWokenTime := 0
 
     ; Try to rename from all possible locked states
-    try A_TrayMenu.Rename("Status: Manually Locked", "Status: Ready")
-    try A_TrayMenu.Rename("Status: Monitor OFF - Locked", "Status: Ready")
-    try A_TrayMenu.Rename("Status: Locked (Monitor Auto-Off Disabled)", "Status: Ready")
+    statusToRestore := "Status: Ready"
+    if (!scriptEnabled)
+        statusToRestore := "Status: Script Disabled"
+    else if (!idleDetectionEnabled)
+        statusToRestore := "Status: Idle Detection Paused"
+
+    try A_TrayMenu.Rename("Status: Manually Locked", statusToRestore)
+    try A_TrayMenu.Rename("Status: Monitor OFF - Locked", statusToRestore)
+    try A_TrayMenu.Rename("Status: Locked (Monitor Auto-Off Disabled)", statusToRestore)
 
     ShowNotification("Unlocked", "System restored")
     DebugLog("Manual Unlock triggered")
@@ -551,6 +592,29 @@ SetTimerCustom(*) {
         autoDetectTimeout := false
         UpdateIdleTimeout()
         UpdateTrayMenu()
+    }
+}
+
+ToggleScriptState(*) {
+    global scriptEnabled, monitorOff
+    scriptEnabled := !scriptEnabled
+    
+    if (scriptEnabled) {
+        TraySetIcon("shell32.dll", 48)
+        A_IconTip := "Idle Locker - Enabled`nDouble-click to disable"
+        UpdateStatusText()
+        ShowNotification("Idle Locker", "Script Enabled")
+        DebugLog("Script completely enabled")
+    } else {
+        TraySetIcon("shell32.dll", 132)
+        A_IconTip := "Idle Locker - Disabled`nDouble-click to enable"
+        
+        if (monitorOff)
+            UnlockSystem()
+            
+        UpdateStatusText()
+        ShowNotification("Idle Locker", "Script Disabled")
+        DebugLog("Script completely disabled")
     }
 }
 
@@ -655,17 +719,23 @@ GetStartupState() {
 
 ; ===== UTILITIES =====
 UpdateStatusText() {
-    global idleDetectionEnabled, monitorOff
+    global idleDetectionEnabled, monitorOff, scriptEnabled
 
     if (monitorOff) {
         return  ; Don't change status if locked
     }
 
-    newStatus := idleDetectionEnabled ? "Status: Ready" : "Status: Disabled"
+    newStatus := "Status: Ready"
+    if (!scriptEnabled)
+        newStatus := "Status: Script Disabled"
+    else if (!idleDetectionEnabled)
+        newStatus := "Status: Idle Detection Paused"
 
     ; Try to rename from any possible current status
     try A_TrayMenu.Rename("Status: Ready", newStatus)
     try A_TrayMenu.Rename("Status: Disabled", newStatus)
+    try A_TrayMenu.Rename("Status: Script Disabled", newStatus)
+    try A_TrayMenu.Rename("Status: Idle Detection Paused", newStatus)
 }
 
 UpdateTrayMenu() {
@@ -766,10 +836,12 @@ DebugLog(msg) {
 }
 
 CleanupAndExit(*) {
-    global mouseBlocked, keyboardBlocked
+    global mouseBlocked, keyboardBlocked, enableMute, originalMuteState
     if (mouseBlocked) BlockMouse(false)
-        if (keyboardBlocked) BlockKeyboard(false)
-            SoundSetMute(false)
+    if (keyboardBlocked) BlockKeyboard(false)
+    
+    if (enableMute && originalMuteState != -1)
+        try SoundSetMute(originalMuteState)
 
     ; Clean up middle button hotkeys
     try Hotkey("MButton", "Off")

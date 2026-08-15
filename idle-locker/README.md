@@ -3,7 +3,7 @@
 A highly configurable AutoHotkey v2 script that monitors your system for inactivity, automatically locks your Windows session, mutes system volume, and disables mouse/keyboard inputs to prevent accidental wake-ups (like cats walking on keyboards) when your monitor is turned off.
 
 ## Version
-Current Version: **1.1.3**
+Current Version: **1.1.5**
 
 [![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=download)](https://github.com/jsoul-dev/automation-scripts/releases/latest/download/idle-locker.ahk)
 
@@ -22,8 +22,9 @@ Current Version: **1.1.3**
 4. The script will sit quietly in your system tray.
 5. **Configuration Options**:
    - **File Defaults**: You can permanently change the default startup settings by opening `idle-locker.ahk` in a text editor and modifying the variables inside the `===== CONFIGURATION =====` block.
-   - **Tray Menu**: Right-click the script's icon in your system tray to access a convenient menu where you can instantly toggle features on the fly, such as Auto Mute, Mouse Lock, and Keyboard Lock.
+   - **Tray Menu**: Right-click the script's icon in your system tray to access a convenient menu where you can instantly toggle features on the fly, such as Auto Mute, Mouse Lock, and Keyboard Lock. You can also double-click the tray icon to completely disable/enable the script.
    - **Manual Lock/Unlock**: You can instantly trigger a lock (or unlock your system) in two ways: by pressing `Ctrl+Alt+U`, or by clicking and holding the **Middle Mouse Button** for **2 seconds**.
+   - **Master Switch**: Press `Ctrl+Alt+D` from anywhere to completely disable or re-enable the script (equivalent to double-clicking the tray icon).
 
 ## Screenshot
 ![Screenshot](../.github/assets/idle-locker.png)
